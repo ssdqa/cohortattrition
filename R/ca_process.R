@@ -71,7 +71,7 @@ ca_process <- function(attrition_tbl,
   }else{att_final <- attrition_process}
 
   cli::cli_inform(str_wrap(paste0('Based on your chosen parameters, we recommend using the following
-                       output function in evp_output: ', output_type, '.')))
+                       output function in ca_output: ', output_type, 'nt.')))
 
   return(att_final %>% replace_site_col())
 
