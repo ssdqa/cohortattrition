@@ -33,7 +33,7 @@ compute_attrition_diff <- function(attrition_tbl,
   step0_cts <- attrition_tbl %>%
     filter(step_number == start_step_num) %>%
     rename('step0_pts' = num_pts) %>%
-    select(qry_site, step0_pts)
+    select(!!sym(site_col), step0_pts)
 
   pct_step0 <- attrition_tbl %>%
     left_join(step0_cts) %>%

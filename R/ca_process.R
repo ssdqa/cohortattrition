@@ -42,7 +42,7 @@ ca_process <- function(attrition_tbl,
                        p_value = 0.9){
 
   ## parameter summary output
-  output_type <- suppressWarnings(param_summ(check_string = 'evp',
+  output_type <- suppressWarnings(param_summ(check_string = 'ca',
                                              as.list(environment())))
 
   ## Add site check
