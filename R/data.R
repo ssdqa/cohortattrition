@@ -5,10 +5,6 @@
 #' parameter in the `ca_process` function. The user should recreate this file
 #' structure and include their study-specific attrition information.
 #'
-#' If attrition files are stored externally and need to be read into the
-#' environment, please store them in the `file_subdirectory` established
-#' when `ssdqa.gen::initialize_dq_session` is executed.
-#'
 #' @format ## `sample_attrition`
 #' A data frame with 10 rows and 4 columns
 #' \describe{

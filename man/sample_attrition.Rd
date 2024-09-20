@@ -24,9 +24,4 @@ A sample version of the file structure expected for the attrition_table
 parameter in the \code{ca_process} function. The user should recreate this file
 structure and include their study-specific attrition information.
 }
-\details{
-If attrition files are stored externally and need to be read into the
-environment, please store them in the \code{file_subdirectory} established
-when \code{ssdqa.gen::initialize_dq_session} is executed.
-}
 \keyword{datasets}
