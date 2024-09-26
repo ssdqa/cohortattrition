@@ -63,7 +63,8 @@ ca_ss_exp_nt <- function(process_output,
   if(log_scale){grph <- grph + scale_y_continuous(transform = 'log') + ggtitle(paste0(title, ' per Attrition Step (Log)'))}
   if(!log_scale){grph <- grph + ggtitle(paste0(title, ' per Attrition Step'))}
 
-  grph_int <- girafe(ggobj = grph)
+  grph[['metadata']] <- tibble('pkg_backend' = 'ggiraph',
+                               'tooltip' = TRUE)
 
   tbl <- process_output %>%
     distinct(step_number, attrition_step) %>%
@@ -74,7 +75,7 @@ ca_ss_exp_nt <- function(process_output,
     #opt_interactive() %>%
     tab_header('Attrition Step Reference')
 
-  output <- list(grph_int,
+  output <- list(grph,
                  tbl)
 
 
@@ -149,7 +150,8 @@ ca_ms_exp_nt <- function(process_output,
   if(log_scale){grph <- grph + scale_y_continuous(transform = 'log') + ggtitle(paste0(title, ' per Attrition Step (Log)'))}
   if(!log_scale){grph <- grph + ggtitle(paste0(title, ' per Attrition Step'))}
 
-  grph_int <- girafe(ggobj = grph)
+  grph[['metadata']] <- tibble('pkg_backend' = 'ggiraph',
+                               'tooltip' = TRUE)
 
 
   tbl <- process_output %>%
@@ -161,7 +163,7 @@ ca_ms_exp_nt <- function(process_output,
     #opt_interactive() %>%
     tab_header('Attrition Step Reference')
 
-  output <- list(grph_int,
+  output <- list(grph,
                  tbl)
 
 
@@ -232,5 +234,8 @@ ca_ms_anom_nt <-function(process_output,
            shape = guide_legend(title = 'Anomaly'),
            size = 'none')
 
-  girafe(ggobj = plt)
+  plt[['metadata']] <- tibble('pkg_backend' = 'ggiraph',
+                               'tooltip' = TRUE)
+
+  return(plt)
 }
