@@ -51,6 +51,10 @@ ca_process <- function(attrition_tbl,
   attrition_tbl <- site_filter$cohort
   site_col <- site_filter$grouped_list
 
+  if(multi_or_single_site == 'single' & site_col == 'site_summ'){
+    cli::cli_abort('Multiple sites detected. For single-site analysis, please only provide the attrition for one site.')
+  }
+
   ## Attrition computations
   attrition_process <- compute_attrition_diff(attrition_tbl = attrition_tbl,
                                               start_step_num = start_step_num,

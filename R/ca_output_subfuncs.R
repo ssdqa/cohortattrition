@@ -44,8 +44,8 @@ ca_ss_exp_nt <- function(process_output,
   }else{cli::cli_abort("Please select a valid output option: {.code num_pts}, {.code prop_retained_start}, {.code prop_retained_prior},
                        or {.code prop_diff_prior}")}
 
-  min_step <- process_output %>% filter(step_number == min(step_number)) %>% pull(step_number)
-  max_step <- process_output %>% filter(step_number == max(step_number)) %>% pull(step_number)
+  min_step <- process_output %>% filter(step_number == min(step_number)) %>% distinct(step_number) %>% pull()
+  max_step <- process_output %>% filter(step_number == max(step_number)) %>% distinct(step_number) %>% pull()
 
   grph <- ggplot(process_output %>% mutate(text = paste0('Step: ', attrition_step,
                                                          '\nPatient Count: ', formatC(num_pts, format = 'd', big.mark = ','),
