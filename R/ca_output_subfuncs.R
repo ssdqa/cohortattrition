@@ -206,6 +206,9 @@ ca_ms_anom_nt <-function(process_output,
   min_step <- process_output %>% filter(step_number == min(step_number)) %>% pull(step_number) %>% unique()
   max_step <- process_output %>% filter(step_number == max(step_number)) %>% pull(step_number) %>% unique()
 
+  check_n <- process_output %>%
+    filter(anomaly_yn != 'no outlier in group')
+
   dat_to_plot <- process_output %>%
     mutate(text=paste("Step: ",attrition_step,
                       "\nSite: ",site,
@@ -213,29 +216,77 @@ ca_ms_anom_nt <-function(process_output,
                       "\nMean: ",round(mean_val,2),
                       '\nSD: ', round(sd_val,2),
                       "\nMedian: ",round(median_val,2),
-                      "\nMAD: ", round(mad_val,2)))
+                      "\nMAD: ", round(mad_val,2))) %>%
+    mutate(anomaly_yn = ifelse(anomaly_yn == 'no outlier in group', 'not outlier', anomaly_yn))
 
-  plt<-ggplot(dat_to_plot %>% filter(anomaly_yn != 'no outlier in group'),
-              aes(x=site, y=step_number, text=text, color=!!sym(output)))+
-    geom_point_interactive(aes(size=mean_val,shape=anomaly_yn, tooltip = text))+
-    geom_point_interactive(data = dat_to_plot %>% filter(anomaly_yn == 'not outlier'),
-                           aes(size=mean_val,shape=anomaly_yn, tooltip = text), shape = 1, color = 'black')+
-    scale_color_ssdqa(palette = 'diverging', discrete = FALSE) +
-    scale_shape_manual(values=c(19,8))+
-    #scale_y_continuous(breaks = seq(min_step, max_step, 1)) +
-    scale_y_reverse(breaks = seq(min_step, max_step, 1)) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle=60, hjust = 1, vjust = 1)) +
-    labs(y = "Variable",
-         size="",
-         title=paste0('Anomalous ', title, ' per Attrition Step'),
-         subtitle = 'Dot size is the mean value per step') +
-    guides(color = guide_colorbar(title = 'Proportion'),
-           shape = guide_legend(title = 'Anomaly'),
-           size = 'none')
+  if(nrow(check_n) > 0){
 
-  plt[['metadata']] <- tibble('pkg_backend' = 'ggiraph',
+    plt<-ggplot(dat_to_plot,
+                aes(x=site, y=step_number, text=text, color=!!sym(output)))+
+      geom_point_interactive(aes(size=mean_val,shape=anomaly_yn, tooltip = text))+
+      geom_point_interactive(data = dat_to_plot %>% filter(anomaly_yn == 'not outlier'),
+                             aes(size=mean_val,shape=anomaly_yn, tooltip = text), shape = 1, color = 'black')+
+      scale_color_ssdqa(palette = 'diverging', discrete = FALSE) +
+      scale_shape_manual(values=c(19,8))+
+      #scale_y_continuous(breaks = seq(min_step, max_step, 1)) +
+      scale_y_reverse(breaks = seq(min_step, max_step, 1)) +
+      theme_minimal() +
+      theme(axis.text.x = element_text(angle=60, hjust = 1, vjust = 1)) +
+      labs(y = "Attrition Step",
+           size="",
+           title=paste0('Anomalous ', title, ' per Attrition Step'),
+           subtitle = 'Dot size is the mean value per step') +
+      guides(color = guide_colorbar(title = 'Proportion'),
+             shape = guide_legend(title = 'Anomaly'),
+             size = 'none')
+
+    plt[['metadata']] <- tibble('pkg_backend' = 'ggiraph',
+                                 'tooltip' = TRUE)
+
+    return(plt)
+
+  }else{
+    plt <- ggplot(dat_to_plot, aes(x = site, y = step_number, fill = !!sym(output),
+                                   tooltip = text)) +
+      geom_tile_interactive() +
+      theme_minimal() +
+      scale_fill_ssdqa(discrete = FALSE, palette = 'diverging') +
+      labs(y = 'Attrition Step',
+           x = 'Site',
+           fill = title)
+
+    # Test Site Score using SD Computation
+    test_site_score <- process_output %>%
+      mutate(dist_mean = (!!sym(output) - mean_val)^2) %>%
+      group_by(site) %>%
+      summarise(n_grp = n(),
+                dist_mean_sum = sum(dist_mean),
+                overall_sd = sqrt(dist_mean_sum / n_grp)) %>%
+      mutate(tooltip = paste0('Site: ', site,
+                              '\nStandard Deviation: ', round(overall_sd, 3)))
+
+    ylim_max <- test_site_score %>% filter(overall_sd == max(overall_sd)) %>% pull(overall_sd) + 1
+    ylim_min <- test_site_score %>% filter(overall_sd == min(overall_sd)) %>% pull(overall_sd) - 1
+
+    g2 <- ggplot(test_site_score, aes(y = overall_sd, x = site, color = site,
+                                      tooltip = tooltip)) +
+      geom_point_interactive(show.legend = FALSE) +
+      theme_minimal() +
+      scale_color_ssdqa() +
+      geom_hline(yintercept = 0, linetype = 'solid') +
+      labs(title = 'Average Standard Deviation per Site',
+           y = 'Average Standard Deviation',
+           x = 'Site')
+
+    plt[["metadata"]] <- tibble('pkg_backend' = 'ggiraph',
+                                'tooltip' = TRUE)
+    g2[["metadata"]] <- tibble('pkg_backend' = 'ggiraph',
                                'tooltip' = TRUE)
 
-  return(plt)
+    opt <- list(plt,
+                g2)
+
+    return(opt)
+  }
+
 }
