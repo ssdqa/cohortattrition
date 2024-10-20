@@ -1,0 +1,35 @@
+name: Feature Request
+description: Cohort Attrition Feature Request
+title: "[New Feature]: "
+labels: ["enhancement"]
+assignees:
+  - wieandk
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for using the SSDQA ecosystem! Please complete this form to submit a feature request for the Cohort Attrition module.
+  - type: checkboxes
+    attributes:
+      label: Function
+      description: Which function would benefit from this new feature?
+      options:
+        - label: ca_process
+        - label: ca_output
+  - type: dropdown
+    attributes:
+      label: Function Configuration
+      description: Does this feature apply to a specific function configuration? Multiple selections are allowed if needed.
+      multiple: true
+      options:
+        - "Single Site, Exploratory, Cross-Sectional"
+        - "Multi-Site, Exploratory, Cross-Sectional"
+        - "Multi-Site, Anomaly Detection, Cross-Sectional"
+  - type: textarea
+    attributes:
+      label: Feature Description
+      description: Please describe the feature you would like to request.
+  - type: textarea
+    attributes:
+      label: Supporting Materials
+      description: Please include any supporting materials (i.e. code snippets, documentation) that you would like to include with your request.
