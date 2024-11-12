@@ -46,6 +46,16 @@ compute_attrition_diff <- function(attrition_tbl,
     left_join(pct_step0) %>%
     arrange(step_number)
 
+  step_join <- final_attrition %>%
+    distinct(step_number, attrition_step)
+  site_join <- final_attrition %>%
+    distinct(!!sym(site_col))
+  fill_join <- site_join %>% cross_join(step_join)
+
+  final_attrition <- final_attrition %>%
+    full_join(fill_join) %>%
+    mutate(across(where(is.numeric), .fns = ~replace_na(.,0)))
+
   return(final_attrition)
 }
 
