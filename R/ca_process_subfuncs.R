@@ -53,9 +53,14 @@ compute_attrition_diff <- function(attrition_tbl,
     distinct(!!sym(site_col))
   fill_join <- site_join %>% cross_join(step_join)
 
-  final_attrition <- final_attrition %>%
+  edit_attrition <- final_attrition %>%
+    filter(step_number != start_step_num) %>%
     full_join(fill_join) %>%
     mutate(across(where(is.numeric), .fns = ~replace_na(.,0)))
+
+  final_attrition <- final_attrition %>%
+    filter(step_number == start_step_num) %>%
+    union(edit_attrition)
 
   return(final_attrition)
 }
