@@ -48,6 +48,7 @@ compute_attrition_diff <- function(attrition_tbl,
     arrange(step_number)
 
   step_join <- final_attrition %>%
+    filter(step_number != start_step_num) %>%
     distinct(step_number, attrition_step)
   site_join <- final_attrition %>%
     distinct(!!sym(site_col))
