@@ -20,10 +20,10 @@ file that is output to the provided results folder after running the \code{ca_pr
 \item{log_scale}{a logical indicating whether the results should be shown in a log scale}
 
 \item{var_col}{the column of the output variable of interest. options are:
-\code{num_pts} -- the raw count of patients meeting the requirements for each step
-\code{prop_retained_start} -- the proportion of patients retained at each step compared to the user-selected starting step
-\code{prop_retained_prior} -- the proportion of patients retained at each step compared to the prior step
-\code{prop_diff_prior} -- the proportion difference between each step and the step prior}
+- \code{num_pts} -- the raw count of patients meeting the requirements for each step (default)
+- \code{prop_retained_start} -- the proportion of patients retained at each step compared to the user-selected starting step
+- \code{prop_retained_prior} -- the proportion of patients retained at each step compared to the prior step
+- \code{prop_diff_prior} -- the proportion difference between each step and the step prior}
 }
 \value{
 for ss_exp_nt & ms_exp_nt, a line graph displaying the var_col of interest at each
@@ -36,4 +36,35 @@ attrition step is returned, along with a table with the descriptors for each ste
 }
 \description{
 Cohort Attrition Output
+}
+\examples{
+
+#' Build mock study attrition
+sample_attrition <- dplyr::tibble('site' = c('Site A', 'Site A', 'Site A', 'Site A'),
+                                  'step_number' = c(1,2,3,4),
+                                  'attrition_step' = c('step 1', 'step 2', 'step 3', 'step 4'),
+                                  'num_pts' = c(100, 90, 70, 50))
+
+#' Execute `ca_process` function
+#' This example will use the single site, exploratory, cross sectional
+#' configuration
+ca_process_example <- ca_process(attrition_tbl = sample_attrition,
+                                 multi_or_single_site = 'single',
+                                 anomaly_or_exploratory = 'exploratory',
+                                 start_step_num = 1)
+
+ca_process_example
+
+#' Execute `ca_output` function
+ca_output_example <- ca_output(process_output = ca_process_example,
+                               output_function = 'ca_ss_exp_cs',
+                               log_scale = FALSE,
+                               var_col = 'prop_retained_start')
+
+ca_output_example
+
+#' Easily convert the graph into an interactive ggiraph or plotly object with
+#' `make_interactive_ssdqa()`
+
+make_interactive_ssdqa(ca_output_example[[1]])
 }

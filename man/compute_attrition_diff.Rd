@@ -7,13 +7,17 @@
 compute_attrition_diff(attrition_tbl, start_step_num = 0, site_col = "site")
 }
 \arguments{
-\item{attrition_tbl}{CSV file with attrition information - should include the following columns:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{                 num_pts | step_number | attrition_step | site
-}\if{html}{\out{</div>}}}
+\item{attrition_tbl}{CSV file or dataframe with attrition information -
+should include the following columns:
+\itemize{
+\item \code{num_pts}
+\item \code{step_number}
+\item \code{attrition_step}
+\item \code{site}
+}}
 
 \item{start_step_num}{integer indicating the number of the "start" step against which other steps should
-be compared}
+be compared; defaults to 0}
 
 \item{site_col}{the column in the attrition table with the name(s) of the site(s)}
 }

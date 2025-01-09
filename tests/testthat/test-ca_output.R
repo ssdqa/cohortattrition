@@ -10,7 +10,7 @@ test_that('ss exp nt', {
                 'prop_retained_start' = c(NA, 0.9, 0.7, 0.5, NA, 0.8, 0.7, 0.4))
 
   expect_no_error(ca_output(process_output = opt %>% filter(site == 'a'),
-                            output_function = 'ca_ss_exp_nt',
+                            output_function = 'ca_ss_exp_cs',
                             var_col = 'prop_retained_start'))
 
 })
@@ -26,7 +26,7 @@ test_that('ms_exp_nt', {
                 'prop_retained_start' = c(NA, 0.9, 0.7, 0.5, NA, 0.8, 0.7, 0.4))
 
   expect_no_error(ca_output(process_output = opt,
-                            output_function = 'ca_ms_exp_nt',
+                            output_function = 'ca_ms_exp_cs',
                             var_col = 'prop_retained_start'))
 
 
@@ -57,11 +57,11 @@ test_that('ms_anom_nt', {
                                  'no outlier', 'outlier'))
 
   expect_no_error(ca_output(process_output = opt,
-                            output_function = 'ca_ms_anom_nt',
+                            output_function = 'ca_ms_anom_cs',
                             var_col = 'prop_retained_start'))
 
   expect_no_error(ca_output(process_output = opt %>% mutate(anomaly_yn = 'no outlier in group'),
-                            output_function = 'ca_ms_anom_nt',
+                            output_function = 'ca_ms_anom_cs',
                             var_col = 'prop_retained_start'))
 
 })

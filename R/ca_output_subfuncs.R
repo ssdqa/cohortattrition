@@ -1,6 +1,5 @@
 
-#' @importFrom cli cli_div
-#' @importFrom cli cli_abort
+#' @import cli
 #' @import ggiraph
 #' @import gt
 #' @import ggplot2
@@ -10,7 +9,7 @@
 NULL
 
 
-#' Cohort Attrition *Single Site Exploratory No Time*
+#' *Single Site Exploratory Cross-Sectional*
 #'
 #' @param process_output output from compute_attrition_diff
 #' @param log_scale logical to determine whether a log transform should be applied
@@ -27,7 +26,7 @@ NULL
 #'         table with the full descriptions of each step
 #'
 #'
-ca_ss_exp_nt <- function(process_output,
+ca_ss_exp_cs <- function(process_output,
                          log_scale = FALSE,
                          output = 'num_pts'){
 
@@ -85,7 +84,7 @@ ca_ss_exp_nt <- function(process_output,
 
 
 
-#' Cohort Attrition *Multi Site Exploratory No Time*
+#' *Multi Site Exploratory Cross-Sectional*
 #'
 #' @param process_output output from compute_attrition_diff
 #' @param log_scale logical to determine whether a log transform should be applied
@@ -103,7 +102,7 @@ ca_ss_exp_nt <- function(process_output,
 #'
 #' @importFrom rlang :=
 #'
-ca_ms_exp_nt <- function(process_output,
+ca_ms_exp_cs <- function(process_output,
                          log_scale = FALSE,
                          output = 'num_pts'){
 
@@ -171,7 +170,7 @@ ca_ms_exp_nt <- function(process_output,
 
 }
 
-#' Cohort Attrition *Multi Site Anomaly No Time*
+#' *Multi Site Anomaly Cross-Sectional*
 #'
 #' @param process_output output from compute_attrition_diff
 #' @param output the column that should be used as the y-axis:
@@ -187,7 +186,7 @@ ca_ms_exp_nt <- function(process_output,
 #'         anomalies are indicated by STARS, the color of each dot represents the raw output value,
 #'         and the size of each dot represents the mean output value per attrition step
 #'
-ca_ms_anom_nt <-function(process_output,
+ca_ms_anom_cs <-function(process_output,
                          output){
 
   cli::cli_div(theme = list(span.code = list(color = 'blue')))

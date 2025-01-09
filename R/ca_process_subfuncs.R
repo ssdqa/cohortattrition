@@ -1,10 +1,13 @@
 #' Compute difference between attrition steps
 #'
-#' @param attrition_tbl CSV file with attrition information - should include the following columns:
-#'
-#'                      num_pts | step_number | attrition_step | site
+#' @param attrition_tbl CSV file or dataframe with attrition information -
+#'                      should include the following columns:
+#' - `num_pts`
+#' - `step_number`
+#' - `attrition_step`
+#' - `site`
 #' @param start_step_num integer indicating the number of the "start" step against which other steps should
-#'                       be compared
+#'                       be compared; defaults to 0
 #' @param site_col the column in the attrition table with the name(s) of the site(s)
 #'
 #' @return the attrition information plus columns that describe the patient drop & percent difference between
@@ -65,43 +68,3 @@ compute_attrition_diff <- function(attrition_tbl,
 
   return(final_attrition)
 }
-
-
-#' #' Combine attritions from multiple sites
-#' #'
-#' #' This function reads in CSV files with a naming structure of site_file_suffix.csv and
-#' #' combines them into a master file with data from all provided sites
-#' #'
-#' #' @param site_list list of all sites for which there are attrition files
-#' #' @param file_directory the directory holding all of the attrition files
-#' #' @param file_suffix the suffix of the attrition files
-#' #'
-#' #' @return a combined dataframe with attrition information from all of the sites
-#' #'         provided in site_list
-#' #'
-#' #' @importFrom readr read_csv
-#' #'
-#' #'
-#' combine_attritions <- function(site_list,
-#'                                file_directory = paste0(base_dir, '/results/'),
-#'                                file_suffix = NULL){
-#'
-#'   attrition_list <- list()
-#'
-#'   for(i in 1:length(site_list)){
-#'
-#'     file_name <- paste0(site_list[i], file_suffix, '.csv')
-#'
-#'     file <- read_csv(file = paste0(file_directory, file_name))
-#'
-#'
-#'     attrition_list[[i]] <- file
-#'
-#'   }
-#'
-#'   combined_attrition <- reduce(.x = attrition_list,
-#'                                .f = dplyr::union)
-#'
-#'   return(combined_attrition)
-#'
-#' }

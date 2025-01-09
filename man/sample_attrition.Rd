@@ -7,7 +7,7 @@
 \format{
 \subsection{\code{sample_attrition}}{
 
-A data frame with 10 rows and 4 columns
+A data frame with 4 columns
 \describe{
 \item{site}{The name of the institution with which the attrition counts are associated}
 \item{step_number}{An integer indicating the attrition step number}
