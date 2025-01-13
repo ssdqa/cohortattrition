@@ -49,7 +49,11 @@ a dataframe with all the original attrition information, plus columns examining 
 }\if{html}{\out{</div>}}
 }
 \description{
-Cohort Attrition
+This is a plausibility module that will assess attrition counts and how counts
+change from each step to the next to help identify the most impactful and any
+potentially anomalous attrition criteria. The user will provide a precomputed
+attrition. A sample \code{attrition_tbl} with the expected formatting can be found
+using \verb{cohortattrition::}.
 }
 \examples{
 

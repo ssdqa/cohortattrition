@@ -1,5 +1,11 @@
 #' Cohort Attrition
 #'
+#' This is a plausibility module that will assess attrition counts and how counts
+#' change from each step to the next to help identify the most impactful and any
+#' potentially anomalous attrition criteria. The user will provide a precomputed
+#' attrition. A sample `attrition_tbl` with the expected formatting can be found
+#' using `cohortattrition::`.
+#'
 #' @param attrition_tbl table with attrition information for each site needed for analysis
 #'                      should have at least the following columns:
 #' - `site`
