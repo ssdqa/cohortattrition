@@ -82,7 +82,7 @@ ca_output_example <- ca_output(process_output = ca_process_example,
 ca_output_example
 
 #' Easily convert the graph into an interactive ggiraph or plotly object with
-#' `make_interactive_ssdqa()`
+#' `make_interactive_squba()`
 
-make_interactive_ssdqa(ca_output_example[[1]])
+make_interactive_squba(ca_output_example[[1]])
 }

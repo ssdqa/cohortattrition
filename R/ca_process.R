@@ -32,7 +32,7 @@
 #'         if a multi-site anomaly detection analysis is run, this output will also include some descriptive statistics about the chosen
 #'         `var_col` and an indication of which sites are outliers at each attrition step
 #'
-#' @import ssdqa.gen
+#' @import squba.gen
 #' @import argos
 #' @importFrom stringr str_wrap
 #'

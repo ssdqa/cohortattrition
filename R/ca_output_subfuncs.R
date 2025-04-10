@@ -57,7 +57,7 @@ ca_ss_exp_cs <- function(process_output,
     labs(y = title,
          x = 'Step') +
     theme_minimal() +
-    scale_color_ssdqa()
+    scale_color_squba()
 
   if(log_scale){grph <- grph + scale_y_continuous(transform = 'log') + ggtitle(paste0(title, ' per Attrition Step (Log)'))}
   if(!log_scale){grph <- grph + ggtitle(paste0(title, ' per Attrition Step'))}
@@ -144,7 +144,7 @@ ca_ms_exp_cs <- function(process_output,
          x = 'Step',
          color = 'Site') +
     theme_minimal() +
-    scale_color_ssdqa()
+    scale_color_squba()
 
   if(log_scale){grph <- grph + scale_y_continuous(transform = 'log') + ggtitle(paste0(title, ' per Attrition Step (Log)'))}
   if(!log_scale){grph <- grph + ggtitle(paste0(title, ' per Attrition Step'))}
@@ -225,7 +225,7 @@ ca_ms_anom_cs <-function(process_output,
       geom_point_interactive(aes(size=mean_val,shape=anomaly_yn, tooltip = text))+
       geom_point_interactive(data = dat_to_plot %>% filter(anomaly_yn == 'not outlier'),
                              aes(size=mean_val,shape=anomaly_yn, tooltip = text), shape = 1, color = 'black')+
-      scale_color_ssdqa(palette = 'diverging', discrete = FALSE) +
+      scale_color_squba(palette = 'diverging', discrete = FALSE) +
       scale_shape_manual(values=c(19,8))+
       #scale_y_continuous(breaks = seq(min_step, max_step, 1)) +
       scale_y_reverse(breaks = seq(min_step, max_step, 1)) +
@@ -249,7 +249,7 @@ ca_ms_anom_cs <-function(process_output,
                                    tooltip = text)) +
       geom_tile_interactive() +
       theme_minimal() +
-      scale_fill_ssdqa(discrete = FALSE, palette = 'diverging') +
+      scale_fill_squba(discrete = FALSE, palette = 'diverging') +
       labs(y = 'Attrition Step',
            x = 'Site',
            fill = title)
@@ -271,7 +271,7 @@ ca_ms_anom_cs <-function(process_output,
                                       tooltip = tooltip)) +
       geom_point_interactive(show.legend = FALSE) +
       theme_minimal() +
-      scale_color_ssdqa() +
+      scale_color_squba() +
       geom_hline(yintercept = 0, linetype = 'solid') +
       labs(title = 'Average Standard Deviation per Site',
            y = 'Average Standard Deviation',
