@@ -24,6 +24,7 @@ Depends:
     argos,
     R (>= 2.10),
     squba.gen
+Remotes: ssdqa/squba.gen
 LazyData: true
 Imports: 
     cli (>= 3.6.3),
