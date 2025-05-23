@@ -17,7 +17,6 @@ ca_process_example
 
 #' Execute `ca_output` function
 ca_output_example <- ca_output(process_output = ca_process_example,
-                               output_function = 'ca_ss_exp_cs',
                                log_scale = FALSE,
                                var_col = 'prop_retained_start')
 

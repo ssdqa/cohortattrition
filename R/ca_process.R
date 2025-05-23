@@ -6,26 +6,26 @@
 #' attrition. A sample `attrition_tbl` with the expected formatting can be found
 #' using `cohortattrition::`.
 #'
-#' @param attrition_tbl table with attrition information for each site needed for analysis
+#' @param attrition_tbl *tabular input* | table with attrition information for each site needed for analysis
 #'                      should have at least the following columns:
-#' - `site`
-#' - `step_number`
-#' - `attrition_step`
-#' - `num_pts`
+#' - `site` | *character*
+#' - `step_number` | *integer*
+#' - `attrition_step` | *character*
+#' - `num_pts` | *integer*
 #'
-#' @param multi_or_single_site Option to run the function on a single vs multiple sites
+#' @param multi_or_single_site *string* | Option to run the function on a single vs multiple sites
 #'                               - `single` - run the function for a single site
 #'                               - `multi` - run the function for multiple sites
-#' @param anomaly_or_exploratory Option to conduct an exploratory or anomaly detection analysis. Exploratory analyses give a high
+#' @param anomaly_or_exploratory *string* | Option to conduct an exploratory or anomaly detection analysis. Exploratory analyses give a high
 #'                               level summary of the data to examine the fact representation within the cohort. Anomaly detection
 #'                               analyses are specialized to identify outliers within the cohort.
-#' @param start_step_num the `step_number` that should be considered the "start" for the analysis; defaults to 0
-#' @param var_col the column that should be used to conduct the analysis for multi-site anomaly detection. options are:
+#' @param start_step_num *integer* | the `step_number` that should be considered the "start" for the analysis; defaults to 0
+#' @param var_col *string* | the column that should be used to conduct the analysis for multi-site anomaly detection. options are:
 #'                - `num_pts`: raw patient count
 #'                - `prop_retained_start`: proportion patients retained from starting step
 #'                - `prop_retained_prior`: proportion patients retained from prior step
 #'                - `prop_diff_prior`: proportion difference between each step and the prior step
-#' @param p_value the p value to be used as a threshold in the multi-site anomaly detection analysis
+#' @param p_value *numeric* | the p value to be used as a threshold in the multi-site anomaly detection analysis
 #'
 #' @return a dataframe with all the original attrition information, plus columns examining the difference between each step and others.
 #'
@@ -86,9 +86,11 @@ ca_process <- function(attrition_tbl,
 
   }else{att_final <- attrition_process}
 
-  cli::cli_inform(paste0(col_green('Based on your chosen parameters, we recommend using the following
-                       output function in ca_output: '), col_blue(style_bold(output_type,'cs.'))))
+  print(cli::boxx(c('You can optionally use this dataframe in the accompanying',
+                    '`ca_output` function. Here are the parameters you will need:', '', output_type$vector, '',
+                    'See ?ca_output for more details.'), padding = c(0,1,0,1),
+                  header = cli::col_cyan('Output Function Details')))
 
-  return(att_final %>% replace_site_col())
+  return(att_final %>% replace_site_col() %>% mutate(output_function = paste0(output_type$string, 'cs')))
 
 }

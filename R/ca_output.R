@@ -6,11 +6,9 @@
 #' be adjusted by the user after the graph has been output using `+ theme()`. Most graphs can
 #' also be made interactive using `make_interactive_squba()`
 #'
-#' @param process_output the output of the `ca_process` function
-#' @param output_function the name of the output function that should be used provided in the `parameter_summary` csv
-#'                        file that is output to the provided results folder after running the `ca_process` function
-#' @param log_scale a logical indicating whether the results should be shown in a log scale
-#' @param var_col the column of the output variable of interest. options are:
+#' @param process_output *tabular input* | the output of the `ca_process` function
+#' @param log_scale *boolean* | a logical indicating whether the results should be shown in a log scale
+#' @param var_col *string* | the column of the output variable of interest. options are:
 #'                - `num_pts` -- the raw count of patients meeting the requirements for each step (default)
 #'                - `prop_retained_start` -- the proportion of patients retained at each step compared to the user-selected starting step
 #'                - `prop_retained_prior` -- the proportion of patients retained at each step compared to the prior step
@@ -28,9 +26,11 @@
 #' @export
 #'
 ca_output <- function(process_output,
-                      output_function,
                       log_scale = FALSE,
                       var_col = 'num_pts'){
+
+  # extract output function
+  output_function <- process_output %>% collect() %>% ungroup() %>% distinct(output_function) %>% pull()
 
   if(output_function == 'ca_ss_exp_cs'){
     ca_output <- ca_ss_exp_cs(process_output = process_output,

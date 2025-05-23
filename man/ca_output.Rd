@@ -4,22 +4,14 @@
 \alias{ca_output}
 \title{Cohort Attrition -- Output Generation}
 \usage{
-ca_output(
-  process_output,
-  output_function,
-  log_scale = FALSE,
-  var_col = "num_pts"
-)
+ca_output(process_output, log_scale = FALSE, var_col = "num_pts")
 }
 \arguments{
-\item{process_output}{the output of the \code{ca_process} function}
+\item{process_output}{\emph{tabular input} | the output of the \code{ca_process} function}
 
-\item{output_function}{the name of the output function that should be used provided in the \code{parameter_summary} csv
-file that is output to the provided results folder after running the \code{ca_process} function}
+\item{log_scale}{\emph{boolean} | a logical indicating whether the results should be shown in a log scale}
 
-\item{log_scale}{a logical indicating whether the results should be shown in a log scale}
-
-\item{var_col}{the column of the output variable of interest. options are:
+\item{var_col}{\emph{string} | the column of the output variable of interest. options are:
 - \code{num_pts} -- the raw count of patients meeting the requirements for each step (default)
 - \code{prop_retained_start} -- the proportion of patients retained at each step compared to the user-selected starting step
 - \code{prop_retained_prior} -- the proportion of patients retained at each step compared to the prior step
@@ -60,7 +52,6 @@ ca_process_example
 
 #' Execute `ca_output` function
 ca_output_example <- ca_output(process_output = ca_process_example,
-                               output_function = 'ca_ss_exp_cs',
                                log_scale = FALSE,
                                var_col = 'prop_retained_start')
 

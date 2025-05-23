@@ -14,32 +14,32 @@ ca_process(
 )
 }
 \arguments{
-\item{attrition_tbl}{table with attrition information for each site needed for analysis
+\item{attrition_tbl}{\emph{tabular input} | table with attrition information for each site needed for analysis
 should have at least the following columns:
 \itemize{
-\item \code{site}
-\item \code{step_number}
-\item \code{attrition_step}
-\item \code{num_pts}
+\item \code{site} | \emph{character}
+\item \code{step_number} | \emph{integer}
+\item \code{attrition_step} | \emph{character}
+\item \code{num_pts} | \emph{integer}
 }}
 
-\item{multi_or_single_site}{Option to run the function on a single vs multiple sites
+\item{multi_or_single_site}{\emph{string} | Option to run the function on a single vs multiple sites
 - \code{single} - run the function for a single site
 - \code{multi} - run the function for multiple sites}
 
-\item{anomaly_or_exploratory}{Option to conduct an exploratory or anomaly detection analysis. Exploratory analyses give a high
+\item{anomaly_or_exploratory}{\emph{string} | Option to conduct an exploratory or anomaly detection analysis. Exploratory analyses give a high
 level summary of the data to examine the fact representation within the cohort. Anomaly detection
 analyses are specialized to identify outliers within the cohort.}
 
-\item{start_step_num}{the \code{step_number} that should be considered the "start" for the analysis; defaults to 0}
+\item{start_step_num}{\emph{integer} | the \code{step_number} that should be considered the "start" for the analysis; defaults to 0}
 
-\item{var_col}{the column that should be used to conduct the analysis for multi-site anomaly detection. options are:
+\item{var_col}{\emph{string} | the column that should be used to conduct the analysis for multi-site anomaly detection. options are:
 - \code{num_pts}: raw patient count
 - \code{prop_retained_start}: proportion patients retained from starting step
 - \code{prop_retained_prior}: proportion patients retained from prior step
 - \code{prop_diff_prior}: proportion difference between each step and the prior step}
 
-\item{p_value}{the p value to be used as a threshold in the multi-site anomaly detection analysis}
+\item{p_value}{\emph{numeric} | the p value to be used as a threshold in the multi-site anomaly detection analysis}
 }
 \value{
 a dataframe with all the original attrition information, plus columns examining the difference between each step and others.
@@ -75,7 +75,6 @@ ca_process_example
 
 #' Execute `ca_output` function
 ca_output_example <- ca_output(process_output = ca_process_example,
-                               output_function = 'ca_ss_exp_cs',
                                log_scale = FALSE,
                                var_col = 'prop_retained_start')
 

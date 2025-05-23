@@ -7,10 +7,11 @@ test_that('ss exp nt', {
                 'attrition_step' = c('step 1', 'step 2', 'step 3', 'step 4',
                                      'step 1', 'step 2', 'step 3', 'step 4'),
                 'num_pts' = c(100, 90, 70, 50, 150, 100, 60, 30),
-                'prop_retained_start' = c(NA, 0.9, 0.7, 0.5, NA, 0.8, 0.7, 0.4))
+                'prop_retained_start' = c(NA, 0.9, 0.7, 0.5, NA, 0.8, 0.7, 0.4),
+                'output_function' = c('ca_ss_exp_cs', 'ca_ss_exp_cs', 'ca_ss_exp_cs', 'ca_ss_exp_cs',
+                                      'ca_ss_exp_cs', 'ca_ss_exp_cs', 'ca_ss_exp_cs', 'ca_ss_exp_cs'))
 
   expect_no_error(ca_output(process_output = opt %>% filter(site == 'a'),
-                            output_function = 'ca_ss_exp_cs',
                             var_col = 'prop_retained_start'))
 
 })
@@ -23,10 +24,11 @@ test_that('ms_exp_nt', {
                 'attrition_step' = c('step 1', 'step 2', 'step 3', 'step 4',
                                      'step 1', 'step 2', 'step 3', 'step 4'),
                 'num_pts' = c(100, 90, 70, 50, 150, 100, 60, 30),
-                'prop_retained_start' = c(NA, 0.9, 0.7, 0.5, NA, 0.8, 0.7, 0.4))
+                'prop_retained_start' = c(NA, 0.9, 0.7, 0.5, NA, 0.8, 0.7, 0.4),
+                'output_function' = c('ca_ms_exp_cs', 'ca_ms_exp_cs', 'ca_ms_exp_cs', 'ca_ms_exp_cs',
+                                      'ca_ms_exp_cs', 'ca_ms_exp_cs', 'ca_ms_exp_cs', 'ca_ms_exp_cs'))
 
   expect_no_error(ca_output(process_output = opt,
-                            output_function = 'ca_ms_exp_cs',
                             var_col = 'prop_retained_start'))
 
 
@@ -54,14 +56,14 @@ test_that('ms_anom_nt', {
                 'lower_tail' = c(0.8134, 0.8134, 0.8134, 0.8134, 0.8134, 0.8134, 0.8134, 0.8134),
                 'upper_tail' = c(0.932, 0.932, 0.932, 0.932, 0.932, 0.932, 0.932, 0.932),
                 'anomaly_yn' = c('no outlier', 'outlier', 'outlier', 'no outlier', 'outlier', 'outlier',
-                                 'no outlier', 'outlier'))
+                                 'no outlier', 'outlier'),
+                'output_function' = c('ca_ms_anom_cs', 'ca_ms_anom_cs', 'ca_ms_anom_cs', 'ca_ms_anom_cs',
+                                      'ca_ms_anom_cs', 'ca_ms_anom_cs', 'ca_ms_anom_cs', 'ca_ms_anom_cs'))
 
   expect_no_error(ca_output(process_output = opt,
-                            output_function = 'ca_ms_anom_cs',
                             var_col = 'prop_retained_start'))
 
   expect_no_error(ca_output(process_output = opt %>% mutate(anomaly_yn = 'no outlier in group'),
-                            output_function = 'ca_ms_anom_cs',
                             var_col = 'prop_retained_start'))
 
 })
