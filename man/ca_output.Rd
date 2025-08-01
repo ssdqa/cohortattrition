@@ -4,7 +4,13 @@
 \alias{ca_output}
 \title{Cohort Attrition -- Output Generation}
 \usage{
-ca_output(process_output, log_scale = FALSE, var_col = "num_pts")
+ca_output(
+  process_output,
+  log_scale = FALSE,
+  var_col = "num_pts",
+  large_n = FALSE,
+  large_n_sites = NULL
+)
 }
 \arguments{
 \item{process_output}{\emph{tabular input} | the output of the \code{ca_process} function}
@@ -16,6 +22,11 @@ ca_output(process_output, log_scale = FALSE, var_col = "num_pts")
 - \code{prop_retained_start} -- the proportion of patients retained at each step compared to the user-selected starting step
 - \code{prop_retained_prior} -- the proportion of patients retained at each step compared to the prior step
 - \code{prop_diff_prior} -- the proportion difference between each step and the step prior}
+
+\item{large_n}{\emph{boolean} | for multi site analyses, a boolean indicating whether the large N visualization, intended for a high
+volume of sites, should be used; defaults to FALSE}
+
+\item{large_n_sites}{\emph{vector} | for multi site analysese, a vector of site names that can optionally be compared against summary statistics}
 }
 \value{
 for ss_exp_nt & ms_exp_nt, a line graph displaying the var_col of interest at each

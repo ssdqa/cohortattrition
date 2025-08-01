@@ -13,6 +13,9 @@
 #'                - `prop_retained_start` -- the proportion of patients retained at each step compared to the user-selected starting step
 #'                - `prop_retained_prior` -- the proportion of patients retained at each step compared to the prior step
 #'                - `prop_diff_prior` -- the proportion difference between each step and the step prior
+#' @param large_n *boolean* | for multi site analyses, a boolean indicating whether the large N visualization, intended for a high
+#'                volume of sites, should be used; defaults to FALSE
+#' @param large_n_sites *vector* | for multi site analysese, a vector of site names that can optionally be compared against summary statistics
 #'
 #' @return for ss_exp_nt & ms_exp_nt, a line graph displaying the var_col of interest at each
 #'         attrition step is returned, along with a table with the descriptors for each step
@@ -27,7 +30,9 @@
 #'
 ca_output <- function(process_output,
                       log_scale = FALSE,
-                      var_col = 'num_pts'){
+                      var_col = 'num_pts',
+                      large_n = FALSE,
+                      large_n_sites = NULL){
 
   # extract output function
   output_function <- process_output %>% collect() %>% ungroup() %>% distinct(output_function) %>% pull()
@@ -39,10 +44,14 @@ ca_output <- function(process_output,
   }else if(output_function == 'ca_ms_exp_cs'){
     ca_output <- ca_ms_exp_cs(process_output = process_output,
                               log_scale = log_scale,
-                              output = var_col)
+                              output = var_col,
+                              large_n = large_n,
+                              large_n_sites = large_n_sites)
   }else if(output_function == 'ca_ms_anom_cs'){
     ca_output <- ca_ms_anom_cs(process_output = process_output,
-                               output = var_col)
+                               output = var_col,
+                               large_n = large_n,
+                               large_n_sites = large_n_sites)
   }else(cli::cli_abort('Please enter a valid output_function for this check'))
 
   return(ca_output)
