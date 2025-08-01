@@ -356,9 +356,16 @@ ca_ms_anom_cs <-function(process_output,
                zscr = abs(zscr)) %>%
         group_by(step_number, attrition_step) %>%
         filter(zscr == max(zscr, na.rm = TRUE)) %>%
-        summarise(farthest_site = site) %>%
-        summarise_all(toString)
+        summarise(farthest_site = site,
+                  nvar = n())
     )
+
+    if(any(far_site$nvar > 1)){
+      far_site <- far_site %>%
+        summarise_all(toString) %>% select(-nvar)
+    }else{
+      far_site <- far_site %>% select(-nvar)
+    }
 
     suppressWarnings(
       close_site <- process_output %>%
@@ -368,9 +375,16 @@ ca_ms_anom_cs <-function(process_output,
                zscr = abs(zscr)) %>%
         group_by(step_number, attrition_step) %>%
         filter(zscr == min(zscr, na.rm = TRUE)) %>%
-        summarise(closest_site = site) %>%
-        summarise_all(toString)
+        summarise(closest_site = site,
+                  nvar = n())
     )
+
+    if(any(close_site$nvar > 1)){
+      close_site <- close_site %>%
+        summarise_all(toString) %>% select(-nvar)
+    }else{
+      close_site <- close_site %>% select(-nvar)
+    }
 
     nsite_anom <- process_output %>%
       group_by(step_number, attrition_step, anomaly_yn) %>%
