@@ -188,9 +188,17 @@ ca_ms_exp_cs <- function(process_output,
       union(allsite_q1) %>%
       union(allsite_q3)
 
+    if(!is.null(large_n_sites)){
+      alp <- 0.75
+      ltp <- 'dashed'
+    }else{
+      alp <- 1
+      ltp <- 'solid'
+    }
+
     grph <- ggplot(summary_stats,
                    aes(y = !!sym(output), x = step_number, color = site, group = site)) +
-      geom_line(linewidth = 1.2) +
+      geom_line(linewidth = 1.2, alpha = alp, linetype = ltp) +
       geom_line(data = plt_input) +
       geom_point_interactive(data = plt_input,
                              aes(tooltip = text), show.legend = FALSE) +
