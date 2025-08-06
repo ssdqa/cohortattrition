@@ -401,21 +401,31 @@ ca_ms_anom_cs <-function(process_output,
       ungroup() %>%
       select(-anomaly_yn)
 
+    # clps_vals <- process_output %>%
+    #   group_by(step_number, attrition_step,) %>%
+    #   summarise(valcol = list(!!sym(output)))
+
     if(output == 'num_pts'){ndec = 0}else{ndec = 3}
 
     tbl <- process_output %>%
-      distinct(step_number, attrition_step, mean_val, sd_val, median_val, mad_val) %>%
+      group_by(step_number, attrition_step) %>%
+      mutate(iqr_val = stats::IQR(!!sym(output))) %>%
+      ungroup() %>%
+      distinct(step_number, attrition_step, mean_val, sd_val, median_val, iqr_val) %>%
       left_join(nsite_anom) %>%
       left_join(far_site) %>%
       left_join(close_site) %>%
+      # left_join(clps_vals) %>%
       gt::gt() %>%
       tab_header('Large N Anomaly Detection Summary Table') %>%
+      # gtExtras::gt_plt_dist(column = valcol,
+      #                       type = 'boxplot', same_limit = FALSE) %>%
       cols_label(step_number = 'Step Number',
                  attrition_step = 'Step Description',
                  mean_val = 'Mean',
                  sd_val = 'Standard Deviation',
                  median_val = 'Median',
-                 mad_val = 'Median Absolute Deviation',
+                 iqr_val = 'IQR',
                  site_w_anom = 'No. Sites w/ Anomaly',
                  farthest_site = 'Site(s) Farthest from Mean',
                  closest_site = 'Site(s) Closest to Mean') %>%
@@ -423,7 +433,7 @@ ca_ms_anom_cs <-function(process_output,
                   columns = site_w_anom) %>%
       sub_missing(missing_text = '--',
                   columns = c(farthest_site, closest_site)) %>%
-      fmt_number(columns = c(mean_val, median_val, sd_val, mad_val),
+      fmt_number(columns = c(mean_val, median_val, sd_val, iqr_val),
                  decimals = ndec) %>%
       opt_stylize(style = 2)
 
