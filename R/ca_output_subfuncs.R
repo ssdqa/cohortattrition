@@ -401,9 +401,22 @@ ca_ms_anom_cs <-function(process_output,
       ungroup() %>%
       select(-anomaly_yn)
 
-    # clps_vals <- process_output %>%
-    #   group_by(step_number, attrition_step,) %>%
-    #   summarise(valcol = list(!!sym(output)))
+    sitesanoms <- process_output %>%
+      filter(anomaly_yn == 'outlier') %>%
+      group_by(step_number, attrition_step) %>%
+      summarise(site_anoms = toString(site)) %>%
+      select(step_number, attrition_step, site_anoms)
+
+    abbrev_text <- function(x) {
+      paste0(
+        "<div style=\"display:table;table-layout:fixed;width:100%;\">",
+        "<div title=\"", x , "\", ", # `<p>` has been changed to `<div>` here
+        "style=\"overflow-x:hidden;text-overflow:ellipsis;white-space:nowrap\">",
+        x,
+        "</div>",
+        "</div>"
+      )
+    }
 
     if(output == 'num_pts'){ndec = 0}else{ndec = 3}
 
@@ -413,13 +426,14 @@ ca_ms_anom_cs <-function(process_output,
       ungroup() %>%
       distinct(step_number, attrition_step, mean_val, sd_val, median_val, iqr_val) %>%
       left_join(nsite_anom) %>%
+      left_join(sitesanoms) %>%
       left_join(far_site) %>%
       left_join(close_site) %>%
-      # left_join(clps_vals) %>%
       gt::gt() %>%
       tab_header('Large N Anomaly Detection Summary Table') %>%
-      # gtExtras::gt_plt_dist(column = valcol,
-      #                       type = 'boxplot', same_limit = FALSE) %>%
+      gt::text_transform(locations = cells_body(columns = site_anoms,
+                                                rows = site_w_anom > 5),
+                         fn = abbrev_text) %>%
       cols_label(step_number = 'Step Number',
                  attrition_step = 'Step Description',
                  mean_val = 'Mean',
@@ -427,12 +441,13 @@ ca_ms_anom_cs <-function(process_output,
                  median_val = 'Median',
                  iqr_val = 'IQR',
                  site_w_anom = 'No. Sites w/ Anomaly',
+                 site_anoms = 'Site(s) with Anomaly',
                  farthest_site = 'Site(s) Farthest from Mean',
                  closest_site = 'Site(s) Closest to Mean') %>%
       sub_missing(missing_text = 0,
                   columns = site_w_anom) %>%
       sub_missing(missing_text = '--',
-                  columns = c(farthest_site, closest_site)) %>%
+                  columns = c(farthest_site, closest_site, site_anoms)) %>%
       fmt_number(columns = c(mean_val, median_val, sd_val, iqr_val),
                  decimals = ndec) %>%
       opt_stylize(style = 2)

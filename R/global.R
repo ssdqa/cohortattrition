@@ -4,4 +4,4 @@ utils::globalVariables(c('allsite_median', 'anomaly_yn', 'attrition_step',
                          'median_val', 'n_grp', 'num_pts', 'overall_sd',
                          'sd_val', 'site', 'step0_pts', 'step_number',
                          'tooltip', 'closest_site', 'farthest_site', 'site_w_anom',
-                         'zscr', 'nvar', 'iqr_val'))
+                         'zscr', 'nvar', 'iqr_val', 'site_anoms'))
