@@ -407,17 +407,6 @@ ca_ms_anom_cs <-function(process_output,
       summarise(site_anoms = toString(site)) %>%
       select(step_number, attrition_step, site_anoms)
 
-    abbrev_text <- function(x) {
-      paste0(
-        "<div style=\"display:table;table-layout:fixed;width:100%;\">",
-        "<div title=\"", x , "\", ", # `<p>` has been changed to `<div>` here
-        "style=\"overflow-x:hidden;text-overflow:ellipsis;white-space:nowrap\">",
-        x,
-        "</div>",
-        "</div>"
-      )
-    }
-
     if(output == 'num_pts'){ndec = 0}else{ndec = 3}
 
     tbl <- process_output %>%
@@ -429,11 +418,13 @@ ca_ms_anom_cs <-function(process_output,
       left_join(sitesanoms) %>%
       left_join(far_site) %>%
       left_join(close_site) %>%
+      mutate(delim = sub("^([^,]+,){5}([^,]+).*", "\\2", site_anoms),
+             site_anoms = ifelse(site_w_anom > 5,
+                                 stringr::str_replace(site_anoms, paste0(",", delim, '(.*)'), ' . . .'),
+                                 site_anoms)) %>%
+      select(-delim) %>%
       gt::gt() %>%
       tab_header('Large N Anomaly Detection Summary Table') %>%
-      gt::text_transform(locations = cells_body(columns = site_anoms,
-                                                rows = site_w_anom > 5),
-                         fn = abbrev_text) %>%
       cols_label(step_number = 'Step Number',
                  attrition_step = 'Step Description',
                  mean_val = 'Mean',
@@ -484,5 +475,4 @@ ca_ms_anom_cs <-function(process_output,
       return(tbl)
     }
   }
-
 }
