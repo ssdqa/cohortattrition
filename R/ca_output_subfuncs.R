@@ -199,15 +199,16 @@ ca_ms_exp_cs <- function(process_output,
     grph <- ggplot(summary_stats,
                    aes(y = !!sym(output), x = step_number, color = site, group = site)) +
       geom_line(linewidth = 1.2, alpha = alp, linetype = ltp) +
-      geom_line(data = plt_input) +
-      geom_point_interactive(data = plt_input,
-                             aes(tooltip = text), show.legend = FALSE) +
+      geom_point_interactive(aes(tooltip = text), show.legend = FALSE) +
       scale_x_continuous(breaks = seq(min_step, max_step, 1)) +
       labs(y = title,
            x = 'Step',
            color = 'Site') +
       theme_minimal() +
       scale_color_squba()
+
+    if(!is.null(large_n_sites)){grph <- grph + geom_line(data = plt_input) +
+      geom_point_interactive(data = plt_input, aes(tooltip = text))}
 
     if(log_scale){grph <- grph + scale_y_continuous(transform = 'log') + ggtitle(paste0(title, ' per Attrition Step (Log)'))}
     if(!log_scale){grph <- grph + ggtitle(paste0(title, ' per Attrition Step'))}
