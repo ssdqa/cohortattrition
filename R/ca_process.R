@@ -91,6 +91,6 @@ ca_process <- function(attrition_tbl,
                     'See ?ca_output for more details.'), padding = c(0,1,0,1),
                   header = cli::col_cyan('Output Function Details')))
 
-  return(att_final %>% replace_site_col() %>% mutate(output_function = paste0(output_type$string, 'cs')))
+  return(att_final %>% replace_site_col() %>% mutate(output_function = paste0(output_type$string)))
 
 }

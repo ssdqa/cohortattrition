@@ -4,7 +4,7 @@
 \alias{ca_ms_anom_cs}
 \title{\emph{Multi Site Anomaly Cross-Sectional}}
 \usage{
-ca_ms_anom_cs(process_output, output)
+ca_ms_anom_cs(process_output, output, large_n = FALSE, large_n_sites = NULL)
 }
 \arguments{
 \item{process_output}{output from compute_attrition_diff}
@@ -17,6 +17,11 @@ ca_ms_anom_cs(process_output, output)
           `prop_retained_prior` (proportion patients retained from prior step),
           `prop_diff_prior` (proportion difference between each step and the prior step)
 }\if{html}{\out{</div>}}}
+
+\item{large_n}{a boolean indicating whether the large N visualization, intended for a high
+volume of sites, should be used; defaults to FALSE}
+
+\item{large_n_sites}{a vector of site names that can optionally generate a filtered visualization}
 }
 \value{
 a dot plot indicating anomalous sites based on the user selected output value
