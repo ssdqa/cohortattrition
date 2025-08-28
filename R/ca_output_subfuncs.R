@@ -410,6 +410,11 @@ ca_ms_anom_cs <-function(process_output,
 
     if(output == 'num_pts'){ndec = 0}else{ndec = 3}
 
+    if(output != 'num_pts'){
+      process_output <- process_output %>%
+        filter(step_number != min(step_number))
+    }
+
     tbl <- process_output %>%
       group_by(step_number, attrition_step) %>%
       mutate(iqr_val = stats::IQR(!!sym(output))) %>%
