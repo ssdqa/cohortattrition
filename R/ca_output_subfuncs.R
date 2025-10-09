@@ -127,6 +127,10 @@ ca_ms_exp_cs <- function(process_output,
   min_step <- process_output %>% filter(step_number == min(step_number)) %>% pull(step_number) %>% unique()
   max_step <- process_output %>% filter(step_number == max(step_number)) %>% pull(step_number) %>% unique()
 
+  if(!output %in% c('num_pts', 'prop_retained_start')){
+    process_output <- process_output %>%
+      filter(step_number != min(step_number))
+  }
 
   allsite_med <- process_output %>%
     group_by(step_number, attrition_step) %>%
