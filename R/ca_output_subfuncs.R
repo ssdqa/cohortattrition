@@ -47,7 +47,12 @@ ca_ss_exp_cs <- function(process_output,
   min_step <- process_output %>% filter(step_number == min(step_number)) %>% distinct(step_number) %>% pull()
   max_step <- process_output %>% filter(step_number == max(step_number)) %>% distinct(step_number) %>% pull()
 
-  grph <- ggplot(process_output %>% mutate(text = paste0('Step: ', attrition_step,
+  if(!output %in% c('num_pts', 'prop_retained_start')){
+    plt_dat <- process_output %>%
+      filter(step_number != min(step_number))
+  }else{plt_dat <- process_output}
+
+  grph <- ggplot(plt_dat %>% mutate(text = paste0('Step: ', attrition_step,
                                                          '\nPatient Count: ', formatC(num_pts, format = 'd', big.mark = ','),
                                                          '\n',output, ': ', round(!!sym(output), 4))),
                  aes(y = !!sym(output), x = step_number)) +
@@ -126,6 +131,8 @@ ca_ms_exp_cs <- function(process_output,
 
   min_step <- process_output %>% filter(step_number == min(step_number)) %>% pull(step_number) %>% unique()
   max_step <- process_output %>% filter(step_number == max(step_number)) %>% pull(step_number) %>% unique()
+
+  tbl_dat <- process_output
 
   if(!output %in% c('num_pts', 'prop_retained_start')){
     process_output <- process_output %>%
@@ -222,7 +229,7 @@ ca_ms_exp_cs <- function(process_output,
   }
 
 
-  tbl <- process_output %>%
+  tbl <- tbl_dat %>%
     distinct(step_number, attrition_step) %>%
     gt() %>%
     cols_label('step_number' = 'Step Number',
