@@ -73,7 +73,8 @@ sample_attrition <- dplyr::tibble('site' = c('Site A', 'Site A', 'Site A', 'Site
 ca_process_example <- ca_process(attrition_tbl = sample_attrition,
                                  multi_or_single_site = 'single',
                                  anomaly_or_exploratory = 'exploratory',
-                                 start_step_num = 1)
+                                 start_step_num = 1) \%>\%
+  suppressMessages()
 
 ca_process_example
 
@@ -82,7 +83,8 @@ ca_output_example <- ca_output(process_output = ca_process_example,
                                log_scale = FALSE,
                                var_col = 'prop_retained_start')
 
-ca_output_example
+ca_output_example[[1]]
+ca_output_example[[2]]
 
 #' Easily convert the graph into an interactive ggiraph or plotly object with
 #' `make_interactive_squba()`
