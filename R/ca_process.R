@@ -6,31 +6,53 @@
 #' attrition. A sample `attrition_tbl` with the expected formatting can be found
 #' using `cohortattrition::`.
 #'
-#' @param attrition_tbl *tabular input* | table with attrition information for each site needed for analysis
-#'                      should have at least the following columns:
-#' - `site` | *character*
-#' - `step_number` | *integer*
-#' - `attrition_step` | *character*
-#' - `num_pts` | *integer*
+#' @param attrition_tbl *tabular input* || **required**
 #'
-#' @param multi_or_single_site *string* | Option to run the function on a single vs multiple sites
-#'                               - `single` - run the function for a single site
-#'                               - `multi` - run the function for multiple sites
-#' @param anomaly_or_exploratory *string* | Option to conduct an exploratory or anomaly detection analysis. Exploratory analyses give a high
-#'                               level summary of the data to examine the fact representation within the cohort. Anomaly detection
-#'                               analyses are specialized to identify outliers within the cohort.
-#' @param start_step_num *integer* | the `step_number` that should be considered the "start" for the analysis; defaults to 0
-#' @param var_col *string* | the column that should be used to conduct the analysis for multi-site anomaly detection. options are:
-#'                - `num_pts`: raw patient count
-#'                - `prop_retained_start`: proportion patients retained from starting step
-#'                - `prop_retained_prior`: proportion patients retained from prior step
-#'                - `prop_diff_prior`: proportion difference between each step and the prior step
-#' @param p_value *numeric* | the p value to be used as a threshold in the multi-site anomaly detection analysis
+#'  A table or CSV file with attrition information for each site included in the cohort.
+#'  This table should minimally contain:
+#'  - `site` | *character* | the name of the institution
+#'  - `step_number` | *integer* | a numeric identifier for the attrition step
+#'  - `attrition_step` | *character* | a description of the attrition step
+#'  - `num_pts` | *integer* | the patient count for the attrition step
 #'
-#' @return a dataframe with all the original attrition information, plus columns examining the difference between each step and others.
+#' @param multi_or_single_site *string* || defaults to `single`
 #'
-#'         if a multi-site anomaly detection analysis is run, this output will also include some descriptive statistics about the chosen
-#'         `var_col` and an indication of which sites are outliers at each attrition step
+#'   A string, either `single` or `multi`, indicating whether a single-site or
+#'   multi-site analysis should be executed
+#'
+#' @param anomaly_or_exploratory *string* || defaults to `exploratory`
+#'
+#'   A string, either `anomaly` or `exploratory`, indicating what type of results
+#'   should be produced.
+#'
+#'   Exploratory analyses give a high level summary of the data to examine the
+#'   fact representation within the cohort. Anomaly detection analyses are
+#'   specialized to identify outliers within the cohort.
+#'
+#' @param start_step_num *integer* || defaults to `0`
+#'
+#'   The `step_number` from the `attrition_tbl` that should be considered the "start" for
+#'   the analysis. This will drive comparisons of later steps to the start.
+#'
+#' @param var_col *string* || defaults to `num_pts`
+#'
+#'   The name of the column that should be used to conduct the analysis for
+#'   the Multi-Site, Anomaly Detection, Cross-Sectional check. The options are:
+#'   - `num_pts`: raw patient count
+#'   - `prop_retained_start`: proportion patients retained from the starting step, as indicated by `start_step_num`
+#'   - `prop_retained_prior`: proportion patients retained from prior step
+#'   - `prop_diff_prior`: proportion difference between each step and the prior step
+#'
+#' @param p_value *numeric* || defaults to `0.9`
+#'
+#'   The p value to be used as a threshold in the Multi-Site,
+#'   Anomaly Detection, Cross-Sectional analysis
+#'
+#' @return This function will return a dataframe with all the original attrition
+#'         information, plus columns examining the difference between each step and others.
+#'         If the Multi-Site, Anomaly Detection, Cross-Sectional check is run, this output
+#'         will also include some descriptive statistics about the chosen `var_col` and
+#'         an indication of which sites are outliers at each attrition step.
 #'
 #' @import squba.gen
 #' @import argos
@@ -41,8 +63,8 @@
 #' @export
 #'
 ca_process <- function(attrition_tbl,
-                       multi_or_single_site,
-                       anomaly_or_exploratory,
+                       multi_or_single_site = 'single',
+                       anomaly_or_exploratory = 'exploratory',
                        start_step_num = 0,
                        var_col = 'num_pts',
                        p_value = 0.9){

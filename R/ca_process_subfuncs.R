@@ -16,6 +16,8 @@
 #' @import dplyr
 #' @importFrom tidyr replace_na
 #'
+#' @keywords internal
+#'
 
 compute_attrition_diff <- function(attrition_tbl,
                                    start_step_num = 0,

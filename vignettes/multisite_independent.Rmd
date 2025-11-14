@@ -1,0 +1,59 @@
+---
+title: "Multi-Site Analysis for Independent Data Sources"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Multi-Site Analysis for Independent Data Sources}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The multi-site analyses included in this suite are intended to be executed against data that are all stored in the same place. However, there may be some instances where the data associated with each site is stored in independent locations. This vignette outlines how the multi-site analysis can be executed in these instances.
+
+## Multi-Site Exploratory Analysis
+
+First, execute the **Single Site, Exploratory** analyses, configured appropriately for your study, against each data source.
+
+```{r setup, eval=FALSE}
+library(cohortattrition)
+
+my_table <- ca_process(attrition_tbl = my_attrition_counts,
+                       multi_or_single_site = 'single',
+                       anomaly_or_exploratory = 'exploratory',
+                       ...)
+```
+
+Then, combine these results into a single table with the different sites delineated in the `site` column.
+
+```{r, eval=FALSE}
+my_final_results <- my_table1 %>% dplyr::union(my_table2) ... %>%
+  dplyr::union(my_table_n)
+
+```
+
+## Multi-Site Anomaly Detection Analysis
+
+For anomaly detection analysis, start by executing the same steps as the exploratory analysis. Then, the `compute_dist_anomalies` and `detect_outliers` functions, both available through the `squba.gen` package, should be executed against your results. Copy the code below, inputting the table you generated.
+
+`var_col` should be whichever numerical column produced by the exploratory output that should be used as the target for anomaly detection. The `p_value` can be selected by the user.
+
+```{r, eval=FALSE}
+# First execute the compute_dist_anomalies function
+df_start <- compute_dist_anomalies(df_tbl = my_table,
+                                   grp_vars = c('step_number', 'attrition_step'),
+                                   var_col = var_col,
+                                   denom_cols = c('step_number', 'attrition_step'))
+
+# Then, use that output as input for the detect_outliers function
+df_final <- detect_outliers(df_tbl = df_start,
+                            p_input = p_value,
+                            column_analysis = var_col,
+                            column_variable = c('step_number', 'attrition_step'))
+
+```

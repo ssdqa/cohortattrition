@@ -28,3 +28,4 @@ each step and between each step and step 0
 \description{
 Compute difference between attrition steps
 }
+\keyword{internal}

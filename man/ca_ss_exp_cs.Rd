@@ -28,3 +28,4 @@ table with the full descriptions of each step
 \description{
 \emph{Single Site Exploratory Cross-Sectional}
 }
+\keyword{internal}

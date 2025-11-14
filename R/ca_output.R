@@ -6,23 +6,42 @@
 #' be adjusted by the user after the graph has been output using `+ theme()`. Most graphs can
 #' also be made interactive using `make_interactive_squba()`
 #'
-#' @param process_output *tabular input* | the output of the `ca_process` function
-#' @param log_scale *boolean* | a logical indicating whether the results should be shown in a log scale
-#' @param var_col *string* | the column of the output variable of interest. options are:
-#'                - `num_pts` -- the raw count of patients meeting the requirements for each step (default)
-#'                - `prop_retained_start` -- the proportion of patients retained at each step compared to the user-selected starting step
-#'                - `prop_retained_prior` -- the proportion of patients retained at each step compared to the prior step
-#'                - `prop_diff_prior` -- the proportion difference between each step and the step prior
-#' @param large_n *boolean* | for multi site analyses, a boolean indicating whether the large N visualization, intended for a high
-#'                volume of sites, should be used; defaults to FALSE
-#' @param large_n_sites *vector* | for multi site analysese, a vector of site names that can optionally be compared against summary statistics
+#' @param process_output *tabular input* || **required**
 #'
-#' @return for ss_exp_nt & ms_exp_nt, a line graph displaying the var_col of interest at each
-#'         attrition step is returned, along with a table with the descriptors for each step
+#'   The tabular output produced by `ca_process`
 #'
-#'         for ms_anom_nt, a dot plot is returned where anomalous values are shown as stars.
-#'         the size of the dot represents the mean value, while the color represents the value
-#'         of the output column
+#' @param log_scale *boolean* || default to `FALSE`
+#'
+#'   A boolean indicating whether a log transformation should be applied to the
+#'   y-axis of the output
+#'
+#' @param var_col *string* || defaults to `num_pts`
+#'
+#'   The name of the column that should be displayed on the plot for Exploratory analyses.
+#'   The options are:
+#'   - `num_pts`: raw patient count
+#'   - `prop_retained_start`: proportion patients retained from the starting step, as indicated by `start_step_num`
+#'   - `prop_retained_prior`: proportion patients retained from prior step
+#'   - `prop_diff_prior`: proportion difference between each step and the prior step
+#'
+#' @param large_n *boolean* || defaults to `FALSE`
+#'
+#'   For Multi-Site analyses, a boolean indicating whether the large N
+#'   visualization, intended for a high volume of sites, should be used. This
+#'   visualization will produce high level summaries across all sites, with an
+#'   option to add specific site comparators via the `large_n_sites` parameter.
+#'
+#' @param large_n_sites *vector* || defaults to `NULL`
+#'
+#'   When `large_n = TRUE`, a vector of site names that can add site-level information
+#'   to the plot for comparison across the high level summary information.
+#'
+#' @return This function will produce a graph to visualize the results
+#'         from `ca_process` based on the parameters provided. The default
+#'         output is typically a static ggplot or gt object, but interactive
+#'         elements can be activated by passing the plot through `make_interactive_squba`.
+#'         For a more detailed description of output specific to each check type,
+#'         see the PEDSpace metadata repository
 #'
 #' @example inst/example-ca_process_output.R
 #'

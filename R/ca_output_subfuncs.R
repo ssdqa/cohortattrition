@@ -26,6 +26,7 @@ NULL
 #' @return a line graph with the output value for each step and an accompanying
 #'         table with the full descriptions of each step
 #'
+#' @keywords internal
 #'
 ca_ss_exp_cs <- function(process_output,
                          log_scale = FALSE,
@@ -109,6 +110,8 @@ ca_ss_exp_cs <- function(process_output,
 #'         table with the full descriptions of each step
 #'
 #' @importFrom rlang :=
+#'
+#' @keywords internal
 #'
 ca_ms_exp_cs <- function(process_output,
                          log_scale = FALSE,
@@ -262,6 +265,8 @@ ca_ms_exp_cs <- function(process_output,
 #'
 #'         anomalies are indicated by STARS, the color of each dot represents the raw output value,
 #'         and the size of each dot represents the mean output value per attrition step
+#'
+#' @keywords internal
 #'
 ca_ms_anom_cs <-function(process_output,
                          output,
