@@ -1,0 +1,35 @@
+# Cohort Attrition
+
+The Cohort Attrition module identifies trends in the attrition counts
+used in cohort development. It can be used to identify attrition steps
+that are causing significant patient loss or to evaluate institutional
+trends in cohort retention.
+
+## Installation
+
+You can install the development version of this package like so:
+
+``` r
+devtools::install_github('ssdqa/cohort_attrition')
+```
+
+# Package index
+
+## Module Execution
+
+- [`ca_process()`](https://ssdqa.github.io/cohortattrition/reference/ca_process.md)
+  : Cohort Attrition
+- [`ca_output()`](https://ssdqa.github.io/cohortattrition/reference/ca_output.md)
+  : Cohort Attrition – Output Generation
+
+## Sample Attrition Input
+
+- [`sample_attrition`](https://ssdqa.github.io/cohortattrition/reference/sample_attrition.md)
+  : Sample Attrition File
+
+# Articles
+
+### All vignettes
+
+- [Multi-Site Analysis for Independent Data
+  Sources](https://ssdqa.github.io/cohortattrition/articles/multisite_independent.md):

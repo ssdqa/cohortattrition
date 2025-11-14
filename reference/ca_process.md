@@ -1,0 +1,640 @@
+# Cohort Attrition
+
+This is a plausibility module that will assess attrition counts and how
+counts change from each step to the next to help identify the most
+impactful and any potentially anomalous attrition criteria. The user
+will provide a precomputed attrition. A sample `attrition_tbl` with the
+expected formatting can be found using `cohortattrition::`.
+
+## Usage
+
+``` r
+ca_process(
+  attrition_tbl,
+  multi_or_single_site = "single",
+  anomaly_or_exploratory = "exploratory",
+  start_step_num = 0,
+  var_col = "num_pts",
+  p_value = 0.9
+)
+```
+
+## Arguments
+
+- attrition_tbl:
+
+  *tabular input* \|\| **required**
+
+  A table or CSV file with attrition information for each site included
+  in the cohort. This table should minimally contain:
+
+  - `site` \| *character* \| the name of the institution
+
+  - `step_number` \| *integer* \| a numeric identifier for the attrition
+    step
+
+  - `attrition_step` \| *character* \| a description of the attrition
+    step
+
+  - `num_pts` \| *integer* \| the patient count for the attrition step
+
+- multi_or_single_site:
+
+  *string* \|\| defaults to `single`
+
+  A string, either `single` or `multi`, indicating whether a single-site
+  or multi-site analysis should be executed
+
+- anomaly_or_exploratory:
+
+  *string* \|\| defaults to `exploratory`
+
+  A string, either `anomaly` or `exploratory`, indicating what type of
+  results should be produced.
+
+  Exploratory analyses give a high level summary of the data to examine
+  the fact representation within the cohort. Anomaly detection analyses
+  are specialized to identify outliers within the cohort.
+
+- start_step_num:
+
+  *integer* \|\| defaults to `0`
+
+  The `step_number` from the `attrition_tbl` that should be considered
+  the "start" for the analysis. This will drive comparisons of later
+  steps to the start.
+
+- var_col:
+
+  *string* \|\| defaults to `num_pts`
+
+  The name of the column that should be used to conduct the analysis for
+  the Multi-Site, Anomaly Detection, Cross-Sectional check. The options
+  are:
+
+  - `num_pts`: raw patient count
+
+  - `prop_retained_start`: proportion patients retained from the
+    starting step, as indicated by `start_step_num`
+
+  - `prop_retained_prior`: proportion patients retained from prior step
+
+  - `prop_diff_prior`: proportion difference between each step and the
+    prior step
+
+- p_value:
+
+  *numeric* \|\| defaults to `0.9`
+
+  The p value to be used as a threshold in the Multi-Site, Anomaly
+  Detection, Cross-Sectional analysis
+
+## Value
+
+This function will return a dataframe with all the original attrition
+information, plus columns examining the difference between each step and
+others. If the Multi-Site, Anomaly Detection, Cross-Sectional check is
+run, this output will also include some descriptive statistics about the
+chosen `var_col` and an indication of which sites are outliers at each
+attrition step.
+
+## Examples
+
+``` r
+#' Build mock study attrition
+sample_attrition <- dplyr::tibble('site' = c('Site A', 'Site A', 'Site A', 'Site A'),
+                                  'step_number' = c(1,2,3,4),
+                                  'attrition_step' = c('step 1', 'step 2', 'step 3', 'step 4'),
+                                  'num_pts' = c(100, 90, 70, 50))
+
+#' Execute `ca_process` function
+#' This example will use the single site, exploratory, cross sectional
+#' configuration
+ca_process_example <- ca_process(attrition_tbl = sample_attrition,
+                                 multi_or_single_site = 'single',
+                                 anomaly_or_exploratory = 'exploratory',
+                                 start_step_num = 1)
+#> Rows: 77 Columns: 5
+#> ── Column specification ────────────────────────────────────────────────────────
+#> Delimiter: ","
+#> chr (5): module, check, Always Required, Required for Check, Optional
+#> 
+#> ℹ Use `spec()` to retrieve the full column specification for this data.
+#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+#> Joining with `by = join_by(site)`
+#> Joining with `by = join_by(site, step_number, attrition_step, num_pts)`
+#> Joining with `by = join_by(site, step_number, attrition_step, num_pts)`
+#> Joining with `by = join_by(site, step_number, attrition_step)`
+#> ┌ Output Function Details ─────────────────────────────────────┐
+#> │ You can optionally use this dataframe in the accompanying    │
+#> │ `ca_output` function. Here are the parameters you will need: │
+#> │                                                              │
+#> │ Always Required: process_output, var_col                     │
+#> │ Optional: log_scale                                          │
+#> │                                                              │
+#> │ See ?ca_output for more details.                             │
+#> └──────────────────────────────────────────────────────────────┘
+
+ca_process_example
+#> # A tibble: 4 × 9
+#>   site   step_number attrition_step num_pts prop_retained_prior ct_diff_prior
+#>   <chr>        <dbl> <chr>            <dbl>               <dbl>         <dbl>
+#> 1 Site A           1 step 1             100              NA                NA
+#> 2 Site A           2 step 2              90               0.9              10
+#> 3 Site A           3 step 3              70               0.778            20
+#> 4 Site A           4 step 4              50               0.714            20
+#> # ℹ 3 more variables: prop_diff_prior <dbl>, prop_retained_start <dbl>,
+#> #   output_function <chr>
+
+#' Execute `ca_output` function
+ca_output_example <- ca_output(process_output = ca_process_example,
+                               log_scale = FALSE,
+                               var_col = 'prop_retained_start')
+
+ca_output_example
+#> [[1]]
+
+#> 
+#> [[2]]
+#> <div id="eulbfdpbcy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+#>   <style>#eulbfdpbcy table {
+#>   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+#>   -webkit-font-smoothing: antialiased;
+#>   -moz-osx-font-smoothing: grayscale;
+#> }
+#> 
+#> #eulbfdpbcy thead, #eulbfdpbcy tbody, #eulbfdpbcy tfoot, #eulbfdpbcy tr, #eulbfdpbcy td, #eulbfdpbcy th {
+#>   border-style: none;
+#> }
+#> 
+#> #eulbfdpbcy p {
+#>   margin: 0;
+#>   padding: 0;
+#> }
+#> 
+#> #eulbfdpbcy .gt_table {
+#>   display: table;
+#>   border-collapse: collapse;
+#>   line-height: normal;
+#>   margin-left: auto;
+#>   margin-right: auto;
+#>   color: #333333;
+#>   font-size: 16px;
+#>   font-weight: normal;
+#>   font-style: normal;
+#>   background-color: #FFFFFF;
+#>   width: auto;
+#>   border-top-style: solid;
+#>   border-top-width: 3px;
+#>   border-top-color: #D5D5D5;
+#>   border-right-style: solid;
+#>   border-right-width: 3px;
+#>   border-right-color: #D5D5D5;
+#>   border-bottom-style: solid;
+#>   border-bottom-width: 3px;
+#>   border-bottom-color: #D5D5D5;
+#>   border-left-style: solid;
+#>   border-left-width: 3px;
+#>   border-left-color: #D5D5D5;
+#> }
+#> 
+#> #eulbfdpbcy .gt_caption {
+#>   padding-top: 4px;
+#>   padding-bottom: 4px;
+#> }
+#> 
+#> #eulbfdpbcy .gt_title {
+#>   color: #333333;
+#>   font-size: 125%;
+#>   font-weight: initial;
+#>   padding-top: 4px;
+#>   padding-bottom: 4px;
+#>   padding-left: 5px;
+#>   padding-right: 5px;
+#>   border-bottom-color: #FFFFFF;
+#>   border-bottom-width: 0;
+#> }
+#> 
+#> #eulbfdpbcy .gt_subtitle {
+#>   color: #333333;
+#>   font-size: 85%;
+#>   font-weight: initial;
+#>   padding-top: 3px;
+#>   padding-bottom: 5px;
+#>   padding-left: 5px;
+#>   padding-right: 5px;
+#>   border-top-color: #FFFFFF;
+#>   border-top-width: 0;
+#> }
+#> 
+#> #eulbfdpbcy .gt_heading {
+#>   background-color: #FFFFFF;
+#>   text-align: center;
+#>   border-bottom-color: #FFFFFF;
+#>   border-left-style: none;
+#>   border-left-width: 1px;
+#>   border-left-color: #D3D3D3;
+#>   border-right-style: none;
+#>   border-right-width: 1px;
+#>   border-right-color: #D3D3D3;
+#> }
+#> 
+#> #eulbfdpbcy .gt_bottom_border {
+#>   border-bottom-style: solid;
+#>   border-bottom-width: 2px;
+#>   border-bottom-color: #D5D5D5;
+#> }
+#> 
+#> #eulbfdpbcy .gt_col_headings {
+#>   border-top-style: solid;
+#>   border-top-width: 2px;
+#>   border-top-color: #D5D5D5;
+#>   border-bottom-style: solid;
+#>   border-bottom-width: 2px;
+#>   border-bottom-color: #D5D5D5;
+#>   border-left-style: none;
+#>   border-left-width: 1px;
+#>   border-left-color: #D3D3D3;
+#>   border-right-style: none;
+#>   border-right-width: 1px;
+#>   border-right-color: #D3D3D3;
+#> }
+#> 
+#> #eulbfdpbcy .gt_col_heading {
+#>   color: #FFFFFF;
+#>   background-color: #004D80;
+#>   font-size: 100%;
+#>   font-weight: normal;
+#>   text-transform: inherit;
+#>   border-left-style: none;
+#>   border-left-width: 1px;
+#>   border-left-color: #D3D3D3;
+#>   border-right-style: none;
+#>   border-right-width: 1px;
+#>   border-right-color: #D3D3D3;
+#>   vertical-align: bottom;
+#>   padding-top: 5px;
+#>   padding-bottom: 6px;
+#>   padding-left: 5px;
+#>   padding-right: 5px;
+#>   overflow-x: hidden;
+#> }
+#> 
+#> #eulbfdpbcy .gt_column_spanner_outer {
+#>   color: #FFFFFF;
+#>   background-color: #004D80;
+#>   font-size: 100%;
+#>   font-weight: normal;
+#>   text-transform: inherit;
+#>   padding-top: 0;
+#>   padding-bottom: 0;
+#>   padding-left: 4px;
+#>   padding-right: 4px;
+#> }
+#> 
+#> #eulbfdpbcy .gt_column_spanner_outer:first-child {
+#>   padding-left: 0;
+#> }
+#> 
+#> #eulbfdpbcy .gt_column_spanner_outer:last-child {
+#>   padding-right: 0;
+#> }
+#> 
+#> #eulbfdpbcy .gt_column_spanner {
+#>   border-bottom-style: solid;
+#>   border-bottom-width: 2px;
+#>   border-bottom-color: #D5D5D5;
+#>   vertical-align: bottom;
+#>   padding-top: 5px;
+#>   padding-bottom: 5px;
+#>   overflow-x: hidden;
+#>   display: inline-block;
+#>   width: 100%;
+#> }
+#> 
+#> #eulbfdpbcy .gt_spanner_row {
+#>   border-bottom-style: hidden;
+#> }
+#> 
+#> #eulbfdpbcy .gt_group_heading {
+#>   padding-top: 8px;
+#>   padding-bottom: 8px;
+#>   padding-left: 5px;
+#>   padding-right: 5px;
+#>   color: #333333;
+#>   background-color: #FFFFFF;
+#>   font-size: 100%;
+#>   font-weight: initial;
+#>   text-transform: inherit;
+#>   border-top-style: solid;
+#>   border-top-width: 2px;
+#>   border-top-color: #D5D5D5;
+#>   border-bottom-style: solid;
+#>   border-bottom-width: 2px;
+#>   border-bottom-color: #D5D5D5;
+#>   border-left-style: none;
+#>   border-left-width: 1px;
+#>   border-left-color: #D3D3D3;
+#>   border-right-style: none;
+#>   border-right-width: 1px;
+#>   border-right-color: #D3D3D3;
+#>   vertical-align: middle;
+#>   text-align: left;
+#> }
+#> 
+#> #eulbfdpbcy .gt_empty_group_heading {
+#>   padding: 0.5px;
+#>   color: #333333;
+#>   background-color: #FFFFFF;
+#>   font-size: 100%;
+#>   font-weight: initial;
+#>   border-top-style: solid;
+#>   border-top-width: 2px;
+#>   border-top-color: #D5D5D5;
+#>   border-bottom-style: solid;
+#>   border-bottom-width: 2px;
+#>   border-bottom-color: #D5D5D5;
+#>   vertical-align: middle;
+#> }
+#> 
+#> #eulbfdpbcy .gt_from_md > :first-child {
+#>   margin-top: 0;
+#> }
+#> 
+#> #eulbfdpbcy .gt_from_md > :last-child {
+#>   margin-bottom: 0;
+#> }
+#> 
+#> #eulbfdpbcy .gt_row {
+#>   padding-top: 8px;
+#>   padding-bottom: 8px;
+#>   padding-left: 5px;
+#>   padding-right: 5px;
+#>   margin: 10px;
+#>   border-top-style: solid;
+#>   border-top-width: 1px;
+#>   border-top-color: #89D3FE;
+#>   border-left-style: solid;
+#>   border-left-width: 1px;
+#>   border-left-color: #89D3FE;
+#>   border-right-style: solid;
+#>   border-right-width: 1px;
+#>   border-right-color: #89D3FE;
+#>   vertical-align: middle;
+#>   overflow-x: hidden;
+#> }
+#> 
+#> #eulbfdpbcy .gt_stub {
+#>   color: #333333;
+#>   background-color: #FFFFFF;
+#>   font-size: 100%;
+#>   font-weight: initial;
+#>   text-transform: inherit;
+#>   border-right-style: solid;
+#>   border-right-width: 2px;
+#>   border-right-color: #5F5F5F;
+#>   padding-left: 5px;
+#>   padding-right: 5px;
+#> }
+#> 
+#> #eulbfdpbcy .gt_stub_row_group {
+#>   color: #333333;
+#>   background-color: #FFFFFF;
+#>   font-size: 100%;
+#>   font-weight: initial;
+#>   text-transform: inherit;
+#>   border-right-style: solid;
+#>   border-right-width: 2px;
+#>   border-right-color: #D3D3D3;
+#>   padding-left: 5px;
+#>   padding-right: 5px;
+#>   vertical-align: top;
+#> }
+#> 
+#> #eulbfdpbcy .gt_row_group_first td {
+#>   border-top-width: 2px;
+#> }
+#> 
+#> #eulbfdpbcy .gt_row_group_first th {
+#>   border-top-width: 2px;
+#> }
+#> 
+#> #eulbfdpbcy .gt_summary_row {
+#>   color: #333333;
+#>   background-color: #89D3FE;
+#>   text-transform: inherit;
+#>   padding-top: 8px;
+#>   padding-bottom: 8px;
+#>   padding-left: 5px;
+#>   padding-right: 5px;
+#> }
+#> 
+#> #eulbfdpbcy .gt_first_summary_row {
+#>   border-top-style: solid;
+#>   border-top-color: #D5D5D5;
+#> }
+#> 
+#> #eulbfdpbcy .gt_first_summary_row.thick {
+#>   border-top-width: 2px;
+#> }
+#> 
+#> #eulbfdpbcy .gt_last_summary_row {
+#>   padding-top: 8px;
+#>   padding-bottom: 8px;
+#>   padding-left: 5px;
+#>   padding-right: 5px;
+#>   border-bottom-style: solid;
+#>   border-bottom-width: 2px;
+#>   border-bottom-color: #D5D5D5;
+#> }
+#> 
+#> #eulbfdpbcy .gt_grand_summary_row {
+#>   color: #FFFFFF;
+#>   background-color: #00A1FF;
+#>   text-transform: inherit;
+#>   padding-top: 8px;
+#>   padding-bottom: 8px;
+#>   padding-left: 5px;
+#>   padding-right: 5px;
+#> }
+#> 
+#> #eulbfdpbcy .gt_first_grand_summary_row {
+#>   padding-top: 8px;
+#>   padding-bottom: 8px;
+#>   padding-left: 5px;
+#>   padding-right: 5px;
+#>   border-top-style: double;
+#>   border-top-width: 6px;
+#>   border-top-color: #D5D5D5;
+#> }
+#> 
+#> #eulbfdpbcy .gt_last_grand_summary_row_top {
+#>   padding-top: 8px;
+#>   padding-bottom: 8px;
+#>   padding-left: 5px;
+#>   padding-right: 5px;
+#>   border-bottom-style: double;
+#>   border-bottom-width: 6px;
+#>   border-bottom-color: #D5D5D5;
+#> }
+#> 
+#> #eulbfdpbcy .gt_striped {
+#>   background-color: #F4F4F4;
+#> }
+#> 
+#> #eulbfdpbcy .gt_table_body {
+#>   border-top-style: solid;
+#>   border-top-width: 2px;
+#>   border-top-color: #D5D5D5;
+#>   border-bottom-style: solid;
+#>   border-bottom-width: 2px;
+#>   border-bottom-color: #D5D5D5;
+#> }
+#> 
+#> #eulbfdpbcy .gt_footnotes {
+#>   color: #333333;
+#>   background-color: #FFFFFF;
+#>   border-bottom-style: none;
+#>   border-bottom-width: 2px;
+#>   border-bottom-color: #D3D3D3;
+#>   border-left-style: none;
+#>   border-left-width: 2px;
+#>   border-left-color: #D3D3D3;
+#>   border-right-style: none;
+#>   border-right-width: 2px;
+#>   border-right-color: #D3D3D3;
+#> }
+#> 
+#> #eulbfdpbcy .gt_footnote {
+#>   margin: 0px;
+#>   font-size: 90%;
+#>   padding-top: 4px;
+#>   padding-bottom: 4px;
+#>   padding-left: 5px;
+#>   padding-right: 5px;
+#> }
+#> 
+#> #eulbfdpbcy .gt_sourcenotes {
+#>   color: #333333;
+#>   background-color: #FFFFFF;
+#>   border-bottom-style: none;
+#>   border-bottom-width: 2px;
+#>   border-bottom-color: #D3D3D3;
+#>   border-left-style: none;
+#>   border-left-width: 2px;
+#>   border-left-color: #D3D3D3;
+#>   border-right-style: none;
+#>   border-right-width: 2px;
+#>   border-right-color: #D3D3D3;
+#> }
+#> 
+#> #eulbfdpbcy .gt_sourcenote {
+#>   font-size: 90%;
+#>   padding-top: 4px;
+#>   padding-bottom: 4px;
+#>   padding-left: 5px;
+#>   padding-right: 5px;
+#> }
+#> 
+#> #eulbfdpbcy .gt_left {
+#>   text-align: left;
+#> }
+#> 
+#> #eulbfdpbcy .gt_center {
+#>   text-align: center;
+#> }
+#> 
+#> #eulbfdpbcy .gt_right {
+#>   text-align: right;
+#>   font-variant-numeric: tabular-nums;
+#> }
+#> 
+#> #eulbfdpbcy .gt_font_normal {
+#>   font-weight: normal;
+#> }
+#> 
+#> #eulbfdpbcy .gt_font_bold {
+#>   font-weight: bold;
+#> }
+#> 
+#> #eulbfdpbcy .gt_font_italic {
+#>   font-style: italic;
+#> }
+#> 
+#> #eulbfdpbcy .gt_super {
+#>   font-size: 65%;
+#> }
+#> 
+#> #eulbfdpbcy .gt_footnote_marks {
+#>   font-size: 75%;
+#>   vertical-align: 0.4em;
+#>   position: initial;
+#> }
+#> 
+#> #eulbfdpbcy .gt_asterisk {
+#>   font-size: 100%;
+#>   vertical-align: 0;
+#> }
+#> 
+#> #eulbfdpbcy .gt_indent_1 {
+#>   text-indent: 5px;
+#> }
+#> 
+#> #eulbfdpbcy .gt_indent_2 {
+#>   text-indent: 10px;
+#> }
+#> 
+#> #eulbfdpbcy .gt_indent_3 {
+#>   text-indent: 15px;
+#> }
+#> 
+#> #eulbfdpbcy .gt_indent_4 {
+#>   text-indent: 20px;
+#> }
+#> 
+#> #eulbfdpbcy .gt_indent_5 {
+#>   text-indent: 25px;
+#> }
+#> 
+#> #eulbfdpbcy .katex-display {
+#>   display: inline-flex !important;
+#>   margin-bottom: 0.75em !important;
+#> }
+#> 
+#> #eulbfdpbcy div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#>   height: 0px !important;
+#> }
+#> </style>
+#>   <table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+#>   <thead>
+#>     <tr class="gt_heading">
+#>       <td colspan="2" class="gt_heading gt_title gt_font_normal gt_bottom_border" style>Attrition Step Reference</td>
+#>     </tr>
+#>     
+#>     <tr class="gt_col_headings">
+#>       <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="step_number">Step Number</th>
+#>       <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="attrition_step">Description</th>
+#>     </tr>
+#>   </thead>
+#>   <tbody class="gt_table_body">
+#>     <tr><td headers="step_number" class="gt_row gt_right">1</td>
+#> <td headers="attrition_step" class="gt_row gt_left">step 1</td></tr>
+#>     <tr><td headers="step_number" class="gt_row gt_right gt_striped">2</td>
+#> <td headers="attrition_step" class="gt_row gt_left gt_striped">step 2</td></tr>
+#>     <tr><td headers="step_number" class="gt_row gt_right">3</td>
+#> <td headers="attrition_step" class="gt_row gt_left">step 3</td></tr>
+#>     <tr><td headers="step_number" class="gt_row gt_right gt_striped">4</td>
+#> <td headers="attrition_step" class="gt_row gt_left gt_striped">step 4</td></tr>
+#>   </tbody>
+#>   
+#> </table>
+#> </div>
+#> 
+
+#' Easily convert the graph into an interactive ggiraph or plotly object with
+#' `make_interactive_squba()`
+
+make_interactive_squba(ca_output_example[[1]])
+
+{"x":{"html":"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='ggiraph-svg' role='graphics-document' id='svg_d52a861fb4450895' viewBox='0 0 432 360'>\n <defs id='svg_d52a861fb4450895_defs'>\n  <clipPath id='svg_d52a861fb4450895_c1'>\n   <rect x='0' y='0' width='432' height='360'/>\n  <\/clipPath>\n  <clipPath id='svg_d52a861fb4450895_c2'>\n   <rect x='37.44' y='23.32' width='389.08' height='304.97'/>\n  <\/clipPath>\n <\/defs>\n <g id='svg_d52a861fb4450895_rootg' class='ggiraph-svg-rootg'>\n  <g clip-path='url(#svg_d52a861fb4450895_c1)'>\n   <rect x='0' y='0' width='432' height='360' fill='#FFFFFF' fill-opacity='1' stroke='#FFFFFF' stroke-opacity='1' stroke-width='0.75' stroke-linejoin='round' stroke-linecap='round' class='ggiraph-svg-bg'/>\n   <rect x='0' y='0' width='432' height='360' fill='#FFFFFF' fill-opacity='1' stroke='none'/>\n  <\/g>\n  <g clip-path='url(#svg_d52a861fb4450895_c2)'>\n   <polyline points='37.44,286.71 426.52,286.71' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='0.53' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='37.44,231.26 426.52,231.26' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='0.53' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='37.44,175.81 426.52,175.81' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='0.53' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='37.44,120.36 426.52,120.36' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='0.53' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='37.44,64.91 426.52,64.91' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='0.53' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='114.08,328.29 114.08,23.32' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='0.53' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='231.98,328.29 231.98,23.32' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='0.53' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='349.88,328.29 349.88,23.32' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='0.53' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='37.44,314.43 426.52,314.43' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='37.44,258.98 426.52,258.98' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='37.44,203.53 426.52,203.53' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='37.44,148.08 426.52,148.08' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='37.44,92.63 426.52,92.63' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='37.44,37.18 426.52,37.18' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='55.13,328.29 55.13,23.32' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='173.03,328.29 173.03,23.32' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='290.93,328.29 290.93,23.32' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='408.84,328.29 408.84,23.32' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='55.13,37.18 173.03,92.63 290.93,203.53 408.84,314.43' fill='none' stroke='#BEBEBE' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <circle id='svg_d52a861fb4450895_e1' cx='55.13' cy='37.18' r='1.47pt' fill='#FF4D6F' fill-opacity='1' stroke='#FF4D6F' stroke-opacity='1' stroke-width='0.71' stroke-linejoin='round' stroke-linecap='round' title='Step: step 1&amp;lt;br/&amp;gt;Patient Count: 100&amp;lt;br/&amp;gt;prop_retained_start: 1'/>\n   <circle id='svg_d52a861fb4450895_e2' cx='173.03' cy='92.63' r='1.47pt' fill='#D2B911' fill-opacity='1' stroke='#D2B911' stroke-opacity='1' stroke-width='0.71' stroke-linejoin='round' stroke-linecap='round' title='Step: step 2&amp;lt;br/&amp;gt;Patient Count: 90&amp;lt;br/&amp;gt;prop_retained_start: 0.9'/>\n   <circle id='svg_d52a861fb4450895_e3' cx='290.93' cy='203.53' r='1.47pt' fill='#7F4C4E' fill-opacity='1' stroke='#7F4C4E' stroke-opacity='1' stroke-width='0.71' stroke-linejoin='round' stroke-linecap='round' title='Step: step 3&amp;lt;br/&amp;gt;Patient Count: 70&amp;lt;br/&amp;gt;prop_retained_start: 0.7'/>\n   <circle id='svg_d52a861fb4450895_e4' cx='408.84' cy='314.43' r='1.47pt' fill='#BD777A' fill-opacity='1' stroke='#BD777A' stroke-opacity='1' stroke-width='0.71' stroke-linejoin='round' stroke-linecap='round' title='Step: step 4&amp;lt;br/&amp;gt;Patient Count: 50&amp;lt;br/&amp;gt;prop_retained_start: 0.5'/>\n  <\/g>\n  <g clip-path='url(#svg_d52a861fb4450895_c1)'>\n   <text x='18.53' y='317.64' font-size='6.6pt' font-family='DejaVu Sans' fill='#4D4D4D' fill-opacity='1'>0.5<\/text>\n   <text x='18.53' y='262.19' font-size='6.6pt' font-family='DejaVu Sans' fill='#4D4D4D' fill-opacity='1'>0.6<\/text>\n   <text x='18.53' y='206.74' font-size='6.6pt' font-family='DejaVu Sans' fill='#4D4D4D' fill-opacity='1'>0.7<\/text>\n   <text x='18.53' y='151.29' font-size='6.6pt' font-family='DejaVu Sans' fill='#4D4D4D' fill-opacity='1'>0.8<\/text>\n   <text x='18.53' y='95.84' font-size='6.6pt' font-family='DejaVu Sans' fill='#4D4D4D' fill-opacity='1'>0.9<\/text>\n   <text x='18.53' y='40.39' font-size='6.6pt' font-family='DejaVu Sans' fill='#4D4D4D' fill-opacity='1'>1.0<\/text>\n   <text x='52.33' y='339.64' font-size='6.6pt' font-family='DejaVu Sans' fill='#4D4D4D' fill-opacity='1'>1<\/text>\n   <text x='170.23' y='339.64' font-size='6.6pt' font-family='DejaVu Sans' fill='#4D4D4D' fill-opacity='1'>2<\/text>\n   <text x='288.14' y='339.64' font-size='6.6pt' font-family='DejaVu Sans' fill='#4D4D4D' fill-opacity='1'>3<\/text>\n   <text x='406.04' y='339.64' font-size='6.6pt' font-family='DejaVu Sans' fill='#4D4D4D' fill-opacity='1'>4<\/text>\n   <text x='219.46' y='352.23' font-size='8.25pt' font-family='DejaVu Sans'>Step<\/text>\n   <text transform='translate(13.50,260.04) rotate(-90.00)' font-size='8.25pt' font-family='DejaVu Sans'>Proportion Retained from Start<\/text>\n   <text x='37.44' y='15.1' font-size='9.9pt' font-family='DejaVu Sans'>Proportion Retained from Start per Attrition Step<\/text>\n  <\/g>\n <\/g>\n<\/svg>","js":null,"uid":"svg_d52a861fb4450895","ratio":1.2,"settings":{"tooltip":{"css":".tooltip_SVGID_ { padding:5px;background:black;color:white;border-radius:2px;text-align:left; ; position:absolute;pointer-events:none;z-index:999;}","placement":"doc","opacity":0.9,"offx":10,"offy":10,"use_cursor_pos":true,"use_fill":false,"use_stroke":false,"delay_over":200,"delay_out":500},"hover":{"css":".hover_data_SVGID_ { fill:orange;stroke:black;cursor:pointer; }\ntext.hover_data_SVGID_ { stroke:none;fill:orange; }\ncircle.hover_data_SVGID_ { fill:orange;stroke:black; }\nline.hover_data_SVGID_, polyline.hover_data_SVGID_ { fill:none;stroke:orange; }\nrect.hover_data_SVGID_, polygon.hover_data_SVGID_, path.hover_data_SVGID_ { fill:orange;stroke:none; }\nimage.hover_data_SVGID_ { stroke:orange; }","reactive":true,"nearest_distance":null},"hover_inv":{"css":""},"hover_key":{"css":".hover_key_SVGID_ { fill:orange;stroke:black;cursor:pointer; }\ntext.hover_key_SVGID_ { stroke:none;fill:orange; }\ncircle.hover_key_SVGID_ { fill:orange;stroke:black; }\nline.hover_key_SVGID_, polyline.hover_key_SVGID_ { fill:none;stroke:orange; }\nrect.hover_key_SVGID_, polygon.hover_key_SVGID_, path.hover_key_SVGID_ { fill:orange;stroke:none; }\nimage.hover_key_SVGID_ { stroke:orange; }","reactive":true},"hover_theme":{"css":".hover_theme_SVGID_ { fill:orange;stroke:black;cursor:pointer; }\ntext.hover_theme_SVGID_ { stroke:none;fill:orange; }\ncircle.hover_theme_SVGID_ { fill:orange;stroke:black; }\nline.hover_theme_SVGID_, polyline.hover_theme_SVGID_ { fill:none;stroke:orange; }\nrect.hover_theme_SVGID_, polygon.hover_theme_SVGID_, path.hover_theme_SVGID_ { fill:orange;stroke:none; }\nimage.hover_theme_SVGID_ { stroke:orange; }","reactive":true},"select":{"css":".select_data_SVGID_ { fill:red;stroke:black;cursor:pointer; }\ntext.select_data_SVGID_ { stroke:none;fill:red; }\ncircle.select_data_SVGID_ { fill:red;stroke:black; }\nline.select_data_SVGID_, polyline.select_data_SVGID_ { fill:none;stroke:red; }\nrect.select_data_SVGID_, polygon.select_data_SVGID_, path.select_data_SVGID_ { fill:red;stroke:none; }\nimage.select_data_SVGID_ { stroke:red; }","type":"multiple","only_shiny":true,"selected":[]},"select_inv":{"css":""},"select_key":{"css":".select_key_SVGID_ { fill:red;stroke:black;cursor:pointer; }\ntext.select_key_SVGID_ { stroke:none;fill:red; }\ncircle.select_key_SVGID_ { fill:red;stroke:black; }\nline.select_key_SVGID_, polyline.select_key_SVGID_ { fill:none;stroke:red; }\nrect.select_key_SVGID_, polygon.select_key_SVGID_, path.select_key_SVGID_ { fill:red;stroke:none; }\nimage.select_key_SVGID_ { stroke:red; }","type":"single","only_shiny":true,"selected":[]},"select_theme":{"css":".select_theme_SVGID_ { fill:red;stroke:black;cursor:pointer; }\ntext.select_theme_SVGID_ { stroke:none;fill:red; }\ncircle.select_theme_SVGID_ { fill:red;stroke:black; }\nline.select_theme_SVGID_, polyline.select_theme_SVGID_ { fill:none;stroke:red; }\nrect.select_theme_SVGID_, polygon.select_theme_SVGID_, path.select_theme_SVGID_ { fill:red;stroke:none; }\nimage.select_theme_SVGID_ { stroke:red; }","type":"single","only_shiny":true,"selected":[]},"zoom":{"min":1,"max":1,"duration":300,"default_on":false},"toolbar":{"position":"topright","pngname":"diagram","tooltips":null,"fixed":false,"hidden":[],"delay_over":200,"delay_out":500},"sizing":{"rescale":true,"width":1}}},"evals":[],"jsHooks":[]}
+```
